@@ -33,7 +33,7 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
       title: 'Analysis',
       headerRight: () => (
         <TouchableOpacity 
-          onPress={() => navigation.navigate('Watchlist')}
+          onPress={() => navigation.navigate('WatchlistTab')}
           style={{ marginRight: 16 }}
         >
           <Text style={{ fontSize: 20 }}>🔖</Text>

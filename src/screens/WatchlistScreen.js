@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore } from '../store/appStore';
 import { COLORS } from '../constants';
 import { EmptyState } from '../components/EmptyState';
@@ -25,6 +26,16 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
   useEffect(() => {
     loadWatchlists();
   }, []);
+
+  // Close input when navigating away from screen
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setShowNewInput(false);
+        setNewWatchlistName('');
+      };
+    }, [])
+  );
 
   const handleCreateWatchlist = async () => {
     if (newWatchlistName.trim()) {
@@ -75,7 +86,7 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
 
   if (watchlists.length === 0) {
     return (
-      <View style={[styles.container, { backgroundColor: colors }, { paddingTop: 10 }]}>
+      <View style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}>
         <EmptyState
           title="My Portfolio"
           description="No watchlists yet. Start by creating one!"
@@ -92,7 +103,7 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors }]}>
+    <View style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: textColor }]}>My Portfolio</Text>
         <TouchableOpacity

@@ -60,7 +60,7 @@ export const SearchScreen = ({ navigation, isDark = false }) => {
   return (
     <View style={[styles.container, { backgroundColor: colors }]}>
       {/* Header with Search Input */}
-      <View style={[styles.header, { backgroundColor: colors }]}>
+      <View style={[styles.header, { backgroundColor: colors, paddingTop: 16 }]}>
         <View style={[styles.searchInputContainer, { backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface, borderColor: isDark ? COLORS.darkBg : COLORS.border }]}>
           <Text style={{ fontSize: 16, marginRight: 8, color: textSecondary }}>🔍</Text>
           <TextInput

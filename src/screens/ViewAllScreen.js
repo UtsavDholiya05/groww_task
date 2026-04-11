@@ -108,7 +108,7 @@ export const ViewAllScreen = ({ route, navigation, isDark = false }) => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors }]}>
+    <View style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}>
       <FlatList
         data={funds}
         renderItem={renderFundCard}
