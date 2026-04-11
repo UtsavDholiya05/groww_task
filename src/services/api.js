@@ -6,11 +6,43 @@ const apiClient = axios.create({
   timeout: 10000,
 });
 
+// Helper function to fetch fund details
+const fetchFundDetailsAsync = async (schemeCode) => {
+  try {
+    const response = await apiClient.get(`/mf/${schemeCode}`);
+    const data = response.data;
+    const meta = data.meta || {};
+    
+    const navHistory = (data.nav || [])
+      .map((item) => ({
+        date: item.date,
+        nav: typeof item.nav === 'string' ? parseFloat(item.nav) : item.nav,
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    const latestNav = navHistory[navHistory.length - 1];
+    return {
+      nav: latestNav?.nav || 0,
+      date: latestNav?.date || new Date().toISOString().split('T')[0],
+    };
+  } catch {
+    return null;
+  }
+};
+
 export const fundAPI = {
   searchFunds: async (query) => {
     try {
-      const response = await apiClient.get(`/mf/search?q=${query}`);
-      return response.data || [];
+      const response = await apiClient.get(`/mf/search?q=${encodeURIComponent(query)}`);
+      const funds = response.data || [];
+      
+      return funds.map((fund) => ({
+        schemeCode: fund.schemeCode,
+        schemeName: fund.schemeName,
+        schemeType: fund.schemeType || 'Growth',
+        amcCode: fund.amcCode,
+        amcName: fund.amcName,
+      }));
     } catch (error) {
       console.error('Search error:', error);
       throw error;
@@ -22,25 +54,36 @@ export const fundAPI = {
       const response = await apiClient.get(`/mf/${schemeCode}`);
       const data = response.data;
       const meta = data.meta || {};
+      
+      // Parse NAV history
       const navHistory = (data.nav || [])
         .map((item) => ({
           date: item.date,
-          nav: parseFloat(item.nav),
+          nav: typeof item.nav === 'string' ? parseFloat(item.nav) : item.nav,
         }))
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
       const latestNav = navHistory[navHistory.length - 1];
+      const previousNav = navHistory[navHistory.length - 2];
+      
+      // Calculate change percentage
+      let changePercent = 0;
+      if (latestNav && previousNav) {
+        changePercent = ((latestNav.nav - previousNav.nav) / previousNav.nav) * 100;
+      }
 
       return {
-        schemeName: meta.schemeName || data.schemeName || '',
-        schemeCode: meta.schemeCode || data.schemeCode || schemeCode,
-        amcName: meta.amcName || data.amcName || '',
-        schemeType: meta.schemeType || data.schemeType || 'Growth',
+        schemeName: meta.schemeName || '',
+        schemeCode: meta.schemeCode || schemeCode,
+        amcName: meta.amcName || '',
+        schemeType: meta.schemeType || 'Growth',
         nav: latestNav?.nav || 0,
         date: latestNav?.date || new Date().toISOString().split('T')[0],
         navHistory: navHistory.slice(-365),
+        changePercent: parseFloat(changePercent.toFixed(2)),
         riskLevel: meta.riskLevel || 'Moderate',
         expenseRatio: meta.expenseRatio || 0,
+        objective: meta.scheme_narrative || '',
       };
     } catch (error) {
       console.error('Fund details error:', error);
@@ -51,7 +94,16 @@ export const fundAPI = {
   getFundsForCategory: async (query, limit = 4) => {
     try {
       const funds = await fundAPI.searchFunds(query);
-      return funds.slice(0, limit);
+      
+      // Fetch NAV for first few funds in background
+      const fundsWithNav = await Promise.all(
+        funds.slice(0, limit).map(async (fund) => {
+          const navData = await fetchFundDetailsAsync(fund.schemeCode);
+          return { ...fund, ...(navData || {}) };
+        })
+      );
+      
+      return fundsWithNav;
     } catch (error) {
       console.error('Category funds error:', error);
       throw error;

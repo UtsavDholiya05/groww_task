@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { COLORS } from '../constants';
 import { fundAPI } from '../services/api';
@@ -53,17 +54,30 @@ export const ViewAllScreen = ({ route, navigation, isDark = false }) => {
     }
   };
 
-  const renderFundCard = ({ item }) => (
-    <View style={styles.cardWrapper}>
-      <FundCard
-        fund={item}
-        isDark={isDark}
+  const renderFundCard = ({ item }) => {
+    const fundType = item.schemeName?.split(' ')[0]?.substring(0, 3) || 'MF';
+    return (
+      <TouchableOpacity
+        style={[styles.listItem, { backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface, borderColor: isDark ? COLORS.darkBg : COLORS.border }]}
         onPress={() => {
           navigation.navigate('ProductDetails', { schemeCode: item.schemeCode });
         }}
-      />
-    </View>
-  );
+      >
+        <View style={[styles.badge, { backgroundColor: COLORS.primaryLight }]}>
+          <Text style={styles.badgeText}>{fundType}</Text>
+        </View>
+        <View style={styles.fundInfo}>
+          <Text style={[styles.fundName, { color: textColor }]} numberOfLines={1}>
+            {item.schemeName}
+          </Text>
+          <Text style={[styles.navLabel, { color: textSecondary }]}>NAV</Text>
+        </View>
+        <Text style={[styles.navValue, { color: COLORS.primary }]}>
+          ₹{item.nav ? (typeof item.nav === 'string' ? parseFloat(item.nav).toFixed(2) : item.nav.toFixed(2)) : 'N/A'}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderFooter = () => {
     if (!loadingMore) return null;
@@ -105,9 +119,7 @@ export const ViewAllScreen = ({ route, navigation, isDark = false }) => {
         data={funds}
         renderItem={renderFundCard}
         keyExtractor={(item) => item.schemeCode}
-        numColumns={2}
         contentContainerStyle={styles.listContent}
-        columnWrapperStyle={styles.columnWrapper}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
@@ -134,15 +146,47 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   listContent: {
-    paddingHorizontal: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     paddingBottom: 16,
   },
-  columnWrapper: {
-    justifyContent: 'space-between',
-    paddingHorizontal: 8,
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 10,
+    borderRadius: 12,
+    borderWidth: 1,
   },
-  cardWrapper: {
+  badge: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  fundInfo: {
     flex: 1,
+  },
+  fundName: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  navLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  navValue: {
+    fontSize: 16,
+    fontWeight: '800',
   },
   footerLoader: {
     paddingVertical: 12,
