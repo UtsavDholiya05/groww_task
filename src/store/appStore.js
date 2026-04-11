@@ -12,6 +12,8 @@ export const useAppStore = create((set, get) => ({
 
   exploreCategories: [],
   loadExploreCategories: async () => {
+    console.log('\n📱 ===== LOADING EXPLORE CATEGORIES =====');
+    
     set({
       exploreCategories: CATEGORIES.map((cat) => ({
         id: cat.id,
@@ -26,31 +28,53 @@ export const useAppStore = create((set, get) => ({
     const categories = [];
     for (const category of CATEGORIES) {
       try {
+        console.log(`\n📂 Loading category: ${category.name} (query: "${category.query}")`);
+        
+        let funds = [];
         const cached = await storageService.getCachedData(
           `explore_${category.id}`
         );
-        if (cached) {
-          categories.push({
-            id: category.id,
-            name: category.name,
-            query: category.query,
-            funds: cached,
-            loading: false,
-            error: null,
-          });
+        
+        // Use cache only if it has valid NAV data
+        if (cached && cached.length > 0 && cached[0].nav && cached[0].nav > 0) {
+          console.log(`  ✅ Using cached data: ${cached.length} funds with NAV`);
+          if (cached.length > 0) {
+            console.log(`     First fund: ${cached[0].schemeName} - NAV: ₹${cached[0].nav}`);
+          }
+          funds = cached;
         } else {
-          const funds = await fundAPI.getFundsForCategory(category.query, 4);
-          await storageService.cacheData(`explore_${category.id}`, funds, 120);
-          categories.push({
-            id: category.id,
-            name: category.name,
-            query: category.query,
-            funds,
-            loading: false,
-            error: null,
-          });
+          // Fetch fresh if cache is empty or doesn't have NAV
+          if (cached) {
+            console.log(`  ⚠️  Cache exists but has no NAV data, fetching fresh...`);
+          } else {
+            console.log(`  🔄 No cache, fetching fresh data from API...`);
+          }
+          
+          funds = await fundAPI.getFundsForCategory(category.query, 4);
+          console.log(`  📥 Received ${funds.length} funds from API`);
+          if (funds.length > 0) {
+            console.log(`     First fund: ${funds[0].schemeName} - NAV: ₹${funds[0].nav || 'N/A'}`);
+          }
+          
+          // Only cache if we got valid data with NAV
+          if (funds.length > 0 && funds[0].nav) {
+            await storageService.cacheData(`explore_${category.id}`, funds, 120);
+            console.log(`  💾 Cached for 120 seconds`);
+          } else {
+            console.log(`  ⚠️  Data has no NAV, not caching`);
+          }
         }
+        
+        categories.push({
+          id: category.id,
+          name: category.name,
+          query: category.query,
+          funds,
+          loading: false,
+          error: null,
+        });
       } catch (error) {
+        console.error(`  ❌ Error loading ${category.name}:`, error.message);
         categories.push({
           id: category.id,
           name: category.name,
@@ -61,6 +85,8 @@ export const useAppStore = create((set, get) => ({
         });
       }
     }
+    
+    console.log('\n✨ EXPLORE CATEGORIES LOADED');
     set({ exploreCategories: categories });
   },
 
@@ -128,7 +154,24 @@ export const useAppStore = create((set, get) => ({
     set({ searchLoading: true, searchError: null });
     try {
       const results = await fundAPI.searchFunds(query);
-      set({ searchResults: results, searchLoading: false });
+      
+      // Fetch full details (with NAV) for first 10 results
+      const resultsWithNav = await Promise.all(
+        results.slice(0, 10).map(async (fund) => {
+          try {
+            const details = await fundAPI.getFundDetails(fund.schemeCode);
+            return details;
+          } catch (err) {
+            console.error(`Failed to get details for ${fund.schemeCode}:`, err.message);
+            return { ...fund, nav: 0 };
+          }
+        })
+      );
+      
+      // For remaining results, keep basic info
+      const remainingResults = results.slice(10);
+      
+      set({ searchResults: [...resultsWithNav, ...remainingResults], searchLoading: false });
     } catch (error) {
       set({ searchError: error.message || 'Search failed', searchLoading: false });
     }

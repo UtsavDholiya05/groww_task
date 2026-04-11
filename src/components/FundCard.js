@@ -10,6 +10,24 @@ export const FundCard = ({ fund, onPress, isDark = false }) => {
   // Extract fund type from scheme name (first word or abbreviation)
   const fundType = fund.schemeName?.split(' ')[0]?.substring(0, 3) || 'MF';
   const fundName = fund.schemeName?.substring(0, 20) || 'Fund';
+  
+  // Improved NAV display with better handling
+  let navDisplay = 'N/A';
+  if (fund.nav !== undefined && fund.nav !== null && fund.nav !== 0) {
+    if (typeof fund.nav === 'string') {
+      const parsed = parseFloat(fund.nav);
+      navDisplay = !isNaN(parsed) ? `${parsed.toFixed(2)}` : 'N/A';
+    } else if (typeof fund.nav === 'number') {
+      navDisplay = fund.nav.toFixed(2);
+    }
+  }
+  
+  // Debug log
+  console.log(`📊 FundCard rendering: ${fundName}`, {
+    navValue: fund.nav,
+    navType: typeof fund.nav,
+    navDisplay: navDisplay,
+  });
 
   return (
     <TouchableOpacity
@@ -26,7 +44,7 @@ export const FundCard = ({ fund, onPress, isDark = false }) => {
       </Text>
 
       <Text style={[styles.navValue, { color: COLORS.primary }]}>
-        ₹{fund.nav ? (typeof fund.nav === 'string' ? parseFloat(fund.nav).toFixed(2) : fund.nav.toFixed(2)) : 'N/A'}
+        ₹{navDisplay}
       </Text>
     </TouchableOpacity>
   );

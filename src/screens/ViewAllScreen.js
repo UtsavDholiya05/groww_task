@@ -54,14 +54,33 @@ export const ViewAllScreen = ({ route, navigation, isDark = false }) => {
     }
   };
 
+  const handleFundPress = async (fund) => {
+    // If fund doesn't have NAV, fetch it before navigating
+    if (!fund.nav || fund.nav === 0) {
+      try {
+        const fullDetails = await fundAPI.getFundDetails(fund.schemeCode);
+        // Update the fund with full details
+        setFunds((prev) =>
+          prev.map((f) => (f.schemeCode === fund.schemeCode ? fullDetails : f))
+        );
+      } catch (err) {
+        console.error('Failed to fetch fund details:', err);
+      }
+    }
+    
+    navigation.navigate('ProductDetails', { schemeCode: fund.schemeCode });
+  };
+
   const renderFundCard = ({ item }) => {
     const fundType = item.schemeName?.split(' ')[0]?.substring(0, 3) || 'MF';
+    const navDisplay = item.nav && item.nav > 0 
+      ? `₹${typeof item.nav === 'string' ? parseFloat(item.nav).toFixed(2) : item.nav.toFixed(2)}`
+      : 'N/A';
+    
     return (
       <TouchableOpacity
         style={[styles.listItem, { backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface, borderColor: isDark ? COLORS.darkBg : COLORS.border }]}
-        onPress={() => {
-          navigation.navigate('ProductDetails', { schemeCode: item.schemeCode });
-        }}
+        onPress={() => handleFundPress(item)}
       >
         <View style={[styles.badge, { borderColor: isDark ? COLORS.darkBg : COLORS.border }]}>
           <Text style={styles.badgeText}>{fundType}</Text>
@@ -71,7 +90,7 @@ export const ViewAllScreen = ({ route, navigation, isDark = false }) => {
             {item.schemeName}
           </Text>
           <Text style={[styles.navInfo, { color: textSecondary }]}>
-            NAV: ₹{item.nav ? (typeof item.nav === 'string' ? parseFloat(item.nav).toFixed(2) : item.nav.toFixed(2)) : 'N/A'}
+            NAV: {navDisplay}
           </Text>
         </View>
       </TouchableOpacity>

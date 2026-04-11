@@ -5,12 +5,16 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Modal,
+  TextInput,
+  Alert,
 } from 'react-native';
 import { useAppStore } from '../store/appStore';
 import { COLORS } from '../constants';
 import { LoadingState } from '../components/LoadingState';
 import { EmptyState } from '../components/EmptyState';
 import { formatCurrency, getChartData } from '../utils/helpers';
+import { SimpleLineChart } from '../components/SimpleLineChart';
 
 export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
   const colors = isDark ? COLORS.darkBg : COLORS.background;
@@ -24,16 +28,92 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
     fundLoading,
     fundError,
     loadFundDetails,
+    watchlists,
+    loadWatchlists,
+    createWatchlist,
+    addFundToWatchlist,
   } = useAppStore();
 
   const [selectedTimePeriod, setSelectedTimePeriod] = useState('ALL');
+  const [showModal, setShowModal] = useState(false);
+  const [newWatchlistName, setNewWatchlistName] = useState('');
+  const [selectedWatchlists, setSelectedWatchlists] = useState([]);
+
+  useEffect(() => {
+    loadWatchlists();
+  }, []);
+
+  useEffect(() => {
+    loadWatchlists();
+  }, []);
+
+  const handleAddToWatchlists = async () => {
+    try {
+      if (selectedWatchlists.length === 0 && !newWatchlistName.trim()) {
+        Alert.alert('Select Action', 'Please select a watchlist or create a new one');
+        return;
+      }
+
+      // Create new watchlist if needed
+      if (newWatchlistName.trim()) {
+        await createWatchlist(newWatchlistName);
+        // Reload watchlists to get the newly created one
+        await loadWatchlists();
+      }
+
+      // Add to selected watchlists
+      for (const watchlistId of selectedWatchlists) {
+        await addFundToWatchlist(watchlistId, schemeCode);
+      }
+
+      // Reload watchlists to ensure store is updated with new funds
+      await loadWatchlists();
+
+      Alert.alert('Success', 'Fund added to portfolio(s)!');
+      setShowModal(false);
+      setNewWatchlistName('');
+      setSelectedWatchlists([]);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to add fund to watchlist');
+    }
+  };
+
+  const handleAddNewWatchlist = async () => {
+    if (!newWatchlistName.trim()) {
+      Alert.alert('Error', 'Please enter a portfolio name');
+      return;
+    }
+
+    try {
+      await createWatchlist(newWatchlistName);
+      await loadWatchlists();
+      
+      // Find the newly created watchlist by name
+      const newWatchlist = watchlists.find((w) => w.name === newWatchlistName.trim());
+      if (newWatchlist) {
+        setSelectedWatchlists((prev) => [...prev, newWatchlist.id]);
+      }
+      
+      setNewWatchlistName('');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to create portfolio');
+    }
+  };
+
+  const toggleWatchlistSelection = (watchlistId) => {
+    setSelectedWatchlists((prev) =>
+      prev.includes(watchlistId)
+        ? prev.filter((id) => id !== watchlistId)
+        : [...prev, watchlistId]
+    );
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
       title: 'Analysis',
       headerRight: () => (
         <TouchableOpacity 
-          onPress={() => navigation.navigate('WatchlistTab')}
+          onPress={() => setShowModal(true)}
           style={{ marginRight: 16 }}
         >
           <Text style={{ fontSize: 20 }}>🔖</Text>
@@ -45,6 +125,41 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
   useEffect(() => {
     loadFundDetails(schemeCode);
   }, [schemeCode]);
+
+  // Get filtered chart data based on selected time period
+  const getFilteredChartData = () => {
+    const navHistory = selectedFund.navHistory || [];
+    if (navHistory.length === 0) return [];
+
+    const now = new Date();
+    const cutoffDate = new Date();
+
+    if (selectedTimePeriod === '6M') {
+      cutoffDate.setMonth(cutoffDate.getMonth() - 6);
+    } else if (selectedTimePeriod === '1Y') {
+      cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
+    }
+
+    return navHistory.filter((item) => {
+      if (selectedTimePeriod === 'ALL') return true;
+      const itemDate = new Date(item.date || 0);
+      return itemDate >= cutoffDate;
+    });
+  };
+
+  // Calculate change percentage for selected period
+  const getChangePercent = () => {
+    const filteredData = getFilteredChartData();
+    if (filteredData.length < 2) return selectedFund.changePercent || 0;
+
+    const oldestNav = filteredData[0].nav;
+    const currentNav = filteredData[filteredData.length - 1].nav;
+
+    if (oldestNav > 0) {
+      return ((currentNav - oldestNav) / oldestNav) * 100;
+    }
+    return 0;
+  };
 
   if (fundLoading) {
     return <LoadingState isDark={isDark} />;
@@ -67,7 +182,8 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
   }
 
   const chartData = getChartData(selectedFund.navHistory || []);
-  const changePercent = selectedFund.changePercent !== undefined ? selectedFund.changePercent : 0;
+  const changePercent = getChangePercent();
+  const filteredChartData = getFilteredChartData();
   const fundCategory = selectedFund.schemeType || 'Equity';
 
   return (
@@ -90,15 +206,15 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
             <Text style={[styles.navAmount, { color: textColor, marginRight: 16 }]}>
               {formatCurrency(selectedFund.nav)}
             </Text>
-            <Text style={[styles.changePercent, { color: COLORS.success }]}>
-              ↑ {changePercent.toFixed(2)}%
+            <Text style={[styles.changePercent, { color: changePercent >= 0 ? COLORS.success : COLORS.error }]}>
+              {changePercent >= 0 ? '↑' : '↓'} {Math.abs(changePercent).toFixed(2)}%
             </Text>
           </View>
         </View>
 
         {/* Chart with Time Period Selector */}
-        {chartData.datasets[0].data.length > 0 ? (
-          <View style={[styles.chartSection, { backgroundColor: surface, borderColor: isDark ? COLORS.darkBg : COLORS.border }]}>
+        {(selectedFund.navHistory || []).length > 0 ? (
+          <View style={[styles.chartSection, { backgroundColor: surface }]}>
             {/* Time Period Buttons */}
             <View style={styles.timePeriodContainer}>
               {['6M', '1Y', 'ALL'].map((period) => (
@@ -114,6 +230,7 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
                     style={[
                       styles.timePeriodText,
                       { color: selectedTimePeriod === period ? COLORS.primary : textSecondary },
+                      selectedTimePeriod === period && { fontWeight: '600' },
                     ]}
                   >
                     {period}
@@ -122,46 +239,14 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
               ))}
             </View>
 
-            {/* Line Chart Visualization */}
-            <View style={styles.lineChartContainer}>
-              <View style={styles.chartArea}>
-                {/* Chart line - simplified visualization */}
-                {chartData.datasets[0].data.map((value, index) => {
-                  const maxValue = Math.max(...chartData.datasets[0].data);
-                  const minValue = Math.min(...chartData.datasets[0].data);
-                  const range = maxValue - minValue || 1;
-                  const heightPercent = ((value - minValue) / range) * 100;
-                  const isLast = index === chartData.datasets[0].data.length - 1;
-                  
-                  return (
-                    <View
-                      key={index}
-                      style={[
-                        styles.chartPoint,
-                        {
-                          flex: 1,
-                          height: '100%',
-                          borderLeftWidth: index > 0 ? 1 : 0,
-                          borderLeftColor: COLORS.primary,
-                        },
-                      ]}
-                    >
-                      <View
-                        style={[
-                          styles.pointIndicator,
-                          {
-                            height: `${heightPercent}%`,
-                            backgroundColor: 'transparent',
-                          },
-                        ]}
-                      >
-                        {isLast && <View style={styles.point} />}
-                      </View>
-                    </View>
-                  );
-                })}
+            {/* Chart Component */}
+            {filteredChartData.length > 0 ? (
+              <SimpleLineChart data={filteredChartData} isDark={isDark} />
+            ) : (
+              <View style={styles.emptyChart}>
+                <Text style={{ color: textSecondary }}>No data for selected period</Text>
               </View>
-            </View>
+            )}
           </View>
         ) : null}
 
@@ -198,6 +283,107 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
 
 
       </ScrollView>
+
+      {/* Add to Watchlist Modal */}
+      <Modal
+        visible={showModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: surface }]}>
+            {/* Header */}
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: textColor }]}>Add to Portfolio</Text>
+              <TouchableOpacity
+                onPress={() => setShowModal(false)}
+                style={styles.closeButton}
+              >
+                <Text style={{ fontSize: 24, color: textSecondary }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* New Watchlist Input */}
+            <View style={styles.newWatchlistSection}>
+              <TextInput
+                style={[
+                  styles.watchlistInput,
+                  {
+                    color: textColor,
+                    borderColor: COLORS.primary,
+                    placeholderTextColor: textSecondary,
+                  },
+                ]}
+                placeholder="New Portfolio Name..."
+                value={newWatchlistName}
+                onChangeText={setNewWatchlistName}
+              />
+              <TouchableOpacity
+                onPress={handleAddNewWatchlist}
+                style={[styles.addButton, { backgroundColor: COLORS.primary }]}
+              >
+                <Text style={styles.addButtonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Divider */}
+            <View style={[styles.divider, { backgroundColor: isDark ? COLORS.darkBg : COLORS.border }]} />
+
+            {/* Existing Watchlists */}
+            <View style={styles.watchlistsContainer}>
+              {watchlists.length === 0 ? (
+                <Text style={[styles.emptyText, { color: textSecondary }]}>
+                  No portfolios yet. Create one above.
+                </Text>
+              ) : (
+                watchlists.map((watchlist) => (
+                  <TouchableOpacity
+                    key={watchlist.id}
+                    style={styles.watchlistItem}
+                    onPress={() => toggleWatchlistSelection(watchlist.id)}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        {
+                          backgroundColor: selectedWatchlists.includes(watchlist.id)
+                            ? COLORS.primary
+                            : 'transparent',
+                          borderColor: COLORS.primary,
+                        },
+                      ]}
+                    >
+                      {selectedWatchlists.includes(watchlist.id) && (
+                        <Text style={{ color: 'white', fontWeight: 'bold' }}>✓</Text>
+                      )}
+                    </View>
+                    <Text style={[styles.watchlistName, { color: textColor }]}>
+                      {watchlist.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.actionButtons}>
+              <TouchableOpacity
+                onPress={() => setShowModal(false)}
+                style={[styles.buttonCancel, { backgroundColor: isDark ? COLORS.darkBg : COLORS.border }]}
+              >
+                <Text style={[styles.buttonText, { color: textColor }]}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleAddToWatchlists}
+                style={[styles.buttonAdd, { backgroundColor: COLORS.primary }]}
+              >
+                <Text style={styles.buttonTextWhite}>Add to Portfolio</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -327,5 +513,119 @@ const styles = StyleSheet.create({
   tableValue: {
     fontSize: 14,
     fontWeight: '700',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingBottom: 20,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    fontStyle: 'italic',
+  },
+  closeButton: {
+    padding: 8,
+  },
+  newWatchlistSection: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 8,
+  },
+  watchlistInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+  },
+  addButton: {
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    justifyContent: 'center',
+  },
+  addButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  watchlistsContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  watchlistItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    gap: 12,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  watchlistName: {
+    fontSize: 14,
+    fontWeight: '500',
+    fontStyle: 'italic',
+  },
+  emptyText: {
+    fontSize: 14,
+    textAlign: 'center',
+    paddingVertical: 12,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  buttonCancel: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonAdd: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  buttonTextWhite: {
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  emptyChart: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 16,
   },
 });

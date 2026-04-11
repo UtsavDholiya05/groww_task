@@ -6,8 +6,8 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-  TextInput,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore } from '../store/appStore';
 import { COLORS } from '../constants';
 import { fundAPI } from '../services/api';
@@ -20,29 +20,77 @@ export const WatchlistDetailScreen = ({ route, navigation, isDark = false }) => 
   const textSecondary = isDark ? COLORS.darkTextSecondary : COLORS.textSecondary;
 
   const { watchlistId } = route.params;
-  const { watchlists, removeFundFromWatchlist, updateWatchlist } = useAppStore();
+  const { watchlists, removeFundFromWatchlist } = useAppStore();
 
   const watchlist = watchlists.find((w) => w.id === watchlistId);
   const [funds, setFunds] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [editingName, setEditingName] = useState(false);
-  const [newName, setNewName] = useState(watchlist?.name || '');
 
   useEffect(() => {
     loadWatchlistFunds();
   }, [watchlist?.funds]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      loadWatchlistFunds();
+    }, [watchlist?.funds])
+  );
+
   const loadWatchlistFunds = async () => {
-    if (!watchlist) return;
+    if (!watchlist || !watchlist.funds || watchlist.funds.length === 0) {
+      setFunds([]);
+      return;
+    }
+    
     setLoading(true);
+    console.log(`\n\n🚀 ===== LOADING WATCHLIST FUNDS =====`);
+    console.log(`Total funds to load: ${watchlist.funds.length}`);
+    console.log(`Watchlist ID: ${watchlistId}`);
+    console.log(`Fund scheme codes:`, watchlist.funds);
+    console.log('=====================================\n');
+    
     try {
-      const fundPromises = watchlist.funds.map((schemeCode) =>
-        fundAPI.getFundDetails(schemeCode).catch(() => null)
-      );
+      const fundPromises = watchlist.funds.map(async (schemeCode) => {
+        try {
+          console.log(`\n📡 Calling getFundDetails for: ${schemeCode}`);
+          const fundDetails = await fundAPI.getFundDetails(schemeCode);
+          
+          console.log(`\n📊 Received for ${schemeCode}:`, {
+            schemeName: fundDetails?.schemeName,
+            nav: fundDetails?.nav,
+            schemeCode: fundDetails?.schemeCode,
+          });
+          
+          // Ensure we have required fields
+          if (fundDetails && fundDetails.schemeName && fundDetails.schemeCode) {
+            console.log(`✅ Valid fund: ${fundDetails.schemeName}, NAV: ₹${fundDetails.nav}`);
+            return fundDetails;
+          }
+          
+          console.warn(`⚠️ Invalid fund details for ${schemeCode}:`, fundDetails);
+          return null;
+        } catch (err) {
+          console.error(`❌ Error loading fund ${schemeCode}:`, err.message);
+          return null;
+        }
+      });
+
       const fundDetails = await Promise.all(fundPromises);
-      setFunds(fundDetails.filter((f) => f !== null));
+      const validFunds = fundDetails.filter((f) => f !== null);
+      
+      console.log(`\n\n✨ FINAL RESULT ✨`);
+      console.log(`Loaded ${validFunds.length} funds out of ${watchlist.funds.length}`);
+      console.log(`Funds to display:`, validFunds.map(f => ({
+        name: f.schemeName,
+        nav: f.nav,
+        code: f.schemeCode
+      })));
+      console.log('==============================\n\n');
+      
+      setFunds(validFunds);
     } catch (error) {
       console.error('Error loading watchlist funds:', error);
+      setFunds([]);
     } finally {
       setLoading(false);
     }
@@ -61,12 +109,7 @@ export const WatchlistDetailScreen = ({ route, navigation, isDark = false }) => 
     ]);
   };
 
-  const handleSaveName = async () => {
-    if (newName.trim() && newName !== watchlist?.name) {
-      await updateWatchlist(watchlistId, newName);
-    }
-    setEditingName(false);
-  };
+
 
   if (!watchlist) {
     return (
@@ -76,63 +119,73 @@ export const WatchlistDetailScreen = ({ route, navigation, isDark = false }) => 
     );
   }
 
-  const renderFundItem = ({ item }) => (
-    <View style={[styles.fundItem, { backgroundColor: surface, borderColor: isDark ? COLORS.darkBg : COLORS.border }]}>
-      <TouchableOpacity
-        style={styles.fundContent}
-        onPress={() => {
-          navigation.navigate('ProductDetails', { schemeCode: item.schemeCode });
-        }}
-      >
-        <Text style={[styles.fundName, { color: textColor }]} numberOfLines={2}>
-          {item.schemeName}
-        </Text>
-        <Text style={[styles.navValue, { color: COLORS.primary }]}>₹{item.nav ? (typeof item.nav === 'string' ? parseFloat(item.nav).toFixed(2) : item.nav.toFixed(2)) : 'N/A'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => handleRemoveFund(item.schemeCode)} style={styles.removeButton}>
-        <Text style={{ color: COLORS.error }}>✕</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  const renderFundItem = ({ item }) => {
+    // Check if NAV is valid - be lenient with the check
+    const navValue = item.nav;
+    const isValidNav = navValue !== null && navValue !== undefined && navValue !== 0;
+    
+    // Detailed NAV display logic
+    let navDisplay = '';
+    if (isValidNav && typeof navValue === 'number' && navValue > 0) {
+      navDisplay = `₹${navValue.toFixed(2)}`;
+    } else if (isValidNav && typeof navValue === 'string') {
+      const parsed = parseFloat(navValue);
+      if (!isNaN(parsed)) {
+        navDisplay = `₹${parsed.toFixed(2)}`;
+      } else {
+        navDisplay = 'Fetching...';
+      }
+    } else {
+      navDisplay = 'Fetching...';
+    }
+    
+    // Log for debugging
+    console.log(`📊 Fund: ${item.schemeName}, Code: ${item.schemeCode}, NAV Value: [${navValue}], Type: ${typeof navValue}, Display: ${navDisplay}`);
+    
+    return (
+      <View style={[styles.fundItem, { backgroundColor: surface, borderColor: isDark ? COLORS.darkBg : COLORS.border }]}>
+        <TouchableOpacity
+          style={styles.fundContent}
+          onPress={() => {
+            if (item.schemeCode) {
+              navigation.navigate('ProductDetails', { schemeCode: item.schemeCode });
+            }
+          }}
+        >
+          <Text style={[styles.fundName, { color: textColor }]} numberOfLines={2}>
+            {item.schemeName || `Fund (${item.schemeCode})`}
+          </Text>
+          <Text style={[styles.navValue, { color: COLORS.primary }]}>
+            {navDisplay}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleRemoveFund(item.schemeCode)} style={styles.removeButton}>
+          <Text style={{ color: COLORS.error }}>✕</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors }, { paddingTop: 10 }]}>
-      <View style={styles.header}>
-        {editingName ? (
-          <View style={styles.editingContainer}>
-            <TextInput
-              style={[
-                styles.editInput,
-                { color: textColor, borderColor: COLORS.primary },
-              ]}
-              value={newName}
-              onChangeText={setNewName}
-              autoFocus
-            />
-            <TouchableOpacity
-              onPress={handleSaveName}
-              style={[styles.saveButton, { backgroundColor: COLORS.primary }]}
-            >
-              <Text style={styles.saveButtonText}>Save</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <TouchableOpacity onPress={() => setEditingName(true)}>
-            <Text style={[styles.title, { color: textColor }]}>{watchlist.name}</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
+    <View style={[styles.container, { backgroundColor: colors }]}>
       {loading ? (
         <View style={styles.loadingContainer}>
           <Text style={{ color: textSecondary }}>Loading...</Text>
         </View>
       ) : funds.length === 0 ? (
-        <EmptyState
-          title="No Funds in This Watchlist"
-          description="Add funds from the Explore screen"
-          isDark={isDark}
-        />
+        <View style={[styles.emptyContainer, { backgroundColor: colors }]}>
+          <EmptyState
+            title="No Funds in This Watchlist"
+            description="Add funds from the Explore screen"
+            isDark={isDark}
+          />
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Explore')}
+            style={[styles.exploreFundsButton, { backgroundColor: COLORS.primary }]}
+          >
+            <Text style={styles.exploreFundsButtonText}>Explore Funds</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
         <FlatList
           data={funds}
@@ -150,40 +203,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  editingContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  editInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 16,
-  },
-  saveButton: {
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    justifyContent: 'center',
-  },
-  saveButtonText: {
-    color: 'white',
-    fontWeight: '600',
-  },
   listContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    paddingTop: 16,
   },
   fundItem: {
     flexDirection: 'row',
@@ -214,5 +237,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  exploreFundsButton: {
+    marginTop: 24,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+  },
+  exploreFundsButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
