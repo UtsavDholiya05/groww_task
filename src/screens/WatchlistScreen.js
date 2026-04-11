@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore } from '../store/appStore';
-import { COLORS } from '../constants';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants';
 import { EmptyState } from '../components/EmptyState';
 
 export const WatchlistScreen = ({ navigation, isDark = false }) => {
@@ -185,15 +185,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: TYPOGRAPHY.sizes['2xl'],
+    fontWeight: TYPOGRAPHY.weights.bold,
   },
   addButton: {
     width: 44,
@@ -201,56 +203,60 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
+    ...SHADOWS.md,
   },
   addButtonText: {
-    fontSize: 24,
+    fontSize: TYPOGRAPHY.sizes.xl,
     color: 'white',
-    fontWeight: 'bold',
+    fontWeight: TYPOGRAPHY.weights.bold,
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
   },
   watchlistCard: {
     flexDirection: 'row',
-    padding: 16,
-    marginBottom: 12,
-    borderRadius: 12,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
+    ...SHADOWS.sm,
   },
   watchlistContent: {
     flex: 1,
   },
   watchlistName: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
+    fontSize: TYPOGRAPHY.sizes.base,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    marginBottom: SPACING.xs,
   },
   fundCount: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.normal,
   },
   deleteButton: {
-    padding: 8,
+    padding: SPACING.sm,
   },
   createButton: {
-    marginHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
+    marginHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: SPACING.xl,
+    ...SHADOWS.md,
   },
   createButtonText: {
     color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: TYPOGRAPHY.sizes.base,
+    fontWeight: TYPOGRAPHY.weights.semibold,
   },
   inputContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
     flexDirection: 'row',
-    gap: 8,
+    gap: SPACING.sm,
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
@@ -258,19 +264,20 @@ const styles = StyleSheet.create({
   newWatchlistInput: {
     flex: 1,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 14,
+    borderRadius: BORDER_RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    fontSize: TYPOGRAPHY.sizes.base,
   },
   createSmallButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.sm,
+    ...SHADOWS.sm,
   },
   createSmallButtonText: {
     color: 'white',
-    fontWeight: '600',
-    fontSize: 12,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    fontSize: TYPOGRAPHY.sizes.sm,
   },
 });

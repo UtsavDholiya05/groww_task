@@ -9,7 +9,7 @@ import {
   TextInput,
 } from 'react-native';
 import { useAppStore } from '../store/appStore';
-import { COLORS } from '../constants';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants';
 import { FundCard } from '../components/FundCard';
 import { SkeletonLoader } from '../components/LoadingState';
 import { EmptyState } from '../components/EmptyState';
@@ -124,69 +124,75 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
   title: {
-    fontSize: 22,
-    fontWeight: '800',
+    fontSize: TYPOGRAPHY.sizes['3xl'],
+    fontWeight: TYPOGRAPHY.weights.bold,
+    letterSpacing: -0.5,
   },
   searchButton: {
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     justifyContent: 'center',
     alignItems: 'center',
+    ...SHADOWS.md,
   },
   searchBarContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
   },
   searchBar: {
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    fontSize: 14,
+    borderRadius: BORDER_RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    fontSize: TYPOGRAPHY.sizes.base,
     borderWidth: 1,
     borderColor: COLORS.border,
+    ...SHADOWS.sm,
   },
   categoriesContainer: {
-    paddingVertical: 8,
+    paddingVertical: SPACING.sm,
   },
   categorySection: {
-    marginBottom: 20,
+    marginBottom: SPACING['2xl'],
   },
   categoryHeader: {
-    paddingHorizontal: 16,
+    paddingHorizontal: SPACING.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
   categoryTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: TYPOGRAPHY.sizes.lg,
+    fontWeight: TYPOGRAPHY.weights.bold,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   viewAllCTA: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: TYPOGRAPHY.sizes.base,
+    fontWeight: TYPOGRAPHY.weights.bold,
   },
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 8,
+    paddingHorizontal: SPACING.sm,
     justifyContent: 'space-between',
   },
   errorContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
   },
   errorText: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: TYPOGRAPHY.sizes.base,
+    fontWeight: TYPOGRAPHY.weights.medium,
   },
 });

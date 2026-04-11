@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import { COLORS } from '../constants';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants';
 import { fundAPI } from '../services/api';
 import { FundCard } from '../components/FundCard';
 import { LoadingState } from '../components/LoadingState';
@@ -147,18 +147,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    paddingBottom: 16,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    paddingBottom: SPACING.lg,
   },
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    marginBottom: 10,
-    borderRadius: 12,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    marginBottom: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
+    ...SHADOWS.sm,
   },
   badge: {
     width: 56,
@@ -166,29 +167,30 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
+    marginRight: SPACING.md,
     borderWidth: 2,
+    backgroundColor: COLORS.primaryLight,
+    borderColor: COLORS.primary,
   },
   badgeText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.bold,
     color: COLORS.primary,
   },
   fundInfo: {
     flex: 1,
   },
   fundName: {
-    fontSize: 15,
-    fontWeight: '600',
-    fontStyle: 'italic',
-    marginBottom: 6,
+    fontSize: TYPOGRAPHY.sizes.base,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    marginBottom: SPACING.xs,
   },
   navInfo: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.medium,
   },
   footerLoader: {
-    paddingVertical: 12,
+    paddingVertical: SPACING.md,
     alignItems: 'center',
   },
 });

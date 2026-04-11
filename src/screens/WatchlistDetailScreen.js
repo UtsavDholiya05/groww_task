@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore } from '../store/appStore';
-import { COLORS } from '../constants';
+import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants';
 import { fundAPI } from '../services/api';
 import { EmptyState } from '../components/EmptyState';
 
@@ -204,34 +204,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingTop: 16,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    paddingTop: SPACING.lg,
   },
   fundItem: {
     flexDirection: 'row',
-    padding: 12,
-    marginBottom: 12,
-    borderRadius: 8,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
+    ...SHADOWS.sm,
   },
   fundContent: {
     flex: 1,
-    marginRight: 12,
+    marginRight: SPACING.md,
   },
   fundName: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 4,
+    fontSize: TYPOGRAPHY.sizes.base,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    marginBottom: SPACING.xs,
   },
   navValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: TYPOGRAPHY.sizes.lg,
+    fontWeight: TYPOGRAPHY.weights.bold,
+    color: COLORS.primary,
   },
   removeButton: {
-    padding: 8,
+    padding: SPACING.sm,
   },
   loadingContainer: {
     flex: 1,
@@ -242,18 +244,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: SPACING.lg,
   },
   exploreFundsButton: {
-    marginTop: 24,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 8,
+    marginTop: SPACING.xl,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: BORDER_RADIUS.md,
+    ...SHADOWS.md,
   },
   exploreFundsButtonText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: TYPOGRAPHY.sizes.base,
+    fontWeight: TYPOGRAPHY.weights.semibold,
     textAlign: 'center',
   },
 });
