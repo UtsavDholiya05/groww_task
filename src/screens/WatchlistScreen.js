@@ -92,7 +92,7 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
+    <View style={[styles.container, { backgroundColor: colors }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: textColor }]}>My Portfolio</Text>
         <TouchableOpacity
@@ -132,7 +132,7 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

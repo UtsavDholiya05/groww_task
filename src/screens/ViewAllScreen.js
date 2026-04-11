@@ -63,18 +63,17 @@ export const ViewAllScreen = ({ route, navigation, isDark = false }) => {
           navigation.navigate('ProductDetails', { schemeCode: item.schemeCode });
         }}
       >
-        <View style={[styles.badge, { backgroundColor: COLORS.primaryLight }]}>
+        <View style={[styles.badge, { borderColor: isDark ? COLORS.darkBg : COLORS.border }]}>
           <Text style={styles.badgeText}>{fundType}</Text>
         </View>
         <View style={styles.fundInfo}>
-          <Text style={[styles.fundName, { color: textColor }]} numberOfLines={1}>
+          <Text style={[styles.fundName, { color: textColor }]} numberOfLines={2}>
             {item.schemeName}
           </Text>
-          <Text style={[styles.navLabel, { color: textSecondary }]}>NAV</Text>
+          <Text style={[styles.navInfo, { color: textSecondary }]}>
+            NAV: ₹{item.nav ? (typeof item.nav === 'string' ? parseFloat(item.nav).toFixed(2) : item.nav.toFixed(2)) : 'N/A'}
+          </Text>
         </View>
-        <Text style={[styles.navValue, { color: COLORS.primary }]}>
-          ₹{item.nav ? (typeof item.nav === 'string' ? parseFloat(item.nav).toFixed(2) : item.nav.toFixed(2)) : 'N/A'}
-        </Text>
       </TouchableOpacity>
     );
   };
@@ -109,12 +108,7 @@ export const ViewAllScreen = ({ route, navigation, isDark = false }) => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors }, { paddingTop: 10 }]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: textColor }]}>{categoryName}</Text>
-        <Text style={[styles.count, { color: textSecondary }]}>{funds.length} funds</Text>
-      </View>
-
+    <View style={[styles.container, { backgroundColor: colors }]}>
       <FlatList
         data={funds}
         renderItem={renderFundCard}
@@ -133,18 +127,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  count: {
-    fontSize: 14,
-  },
   listContent: {
     paddingHorizontal: 12,
     paddingVertical: 12,
@@ -154,21 +136,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 14,
     marginBottom: 10,
     borderRadius: 12,
     borderWidth: 1,
   },
   badge: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
+    borderWidth: 2,
   },
   badgeText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: COLORS.primary,
   },
@@ -176,17 +159,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   fundName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
-    marginBottom: 4,
+    fontStyle: 'italic',
+    marginBottom: 6,
   },
-  navLabel: {
-    fontSize: 11,
+  navInfo: {
+    fontSize: 13,
     fontWeight: '500',
-  },
-  navValue: {
-    fontSize: 16,
-    fontWeight: '800',
   },
   footerLoader: {
     paddingVertical: 12,
