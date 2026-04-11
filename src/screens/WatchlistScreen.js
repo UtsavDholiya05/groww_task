@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Alert,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore } from '../store/appStore';
@@ -86,24 +88,55 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
 
   if (watchlists.length === 0) {
     return (
-      <View style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}
+      >
         <EmptyState
           title="My Portfolio"
           description="No watchlists yet. Start by creating one!"
           isDark={isDark}
         />
-        <TouchableOpacity
-          style={[styles.createButton, { backgroundColor: COLORS.primary }]}
-          onPress={() => setShowNewInput(true)}
-        >
-          <Text style={styles.createButtonText}>+ Create Watchlist</Text>
-        </TouchableOpacity>
-      </View>
+        
+        {showNewInput && (
+          <View style={[styles.inputContainer, { backgroundColor: surface }]}>
+            <TextInput
+              style={[
+                styles.newWatchlistInput,
+                { color: textColor, borderColor: isDark ? COLORS.darkBg : COLORS.border },
+              ]}
+              placeholder="Enter watchlist name"
+              placeholderTextColor={textSecondary}
+              value={newWatchlistName}
+              onChangeText={setNewWatchlistName}
+              autoFocus
+            />
+            <TouchableOpacity
+              style={[styles.createSmallButton, { backgroundColor: COLORS.primary }]}
+              onPress={handleCreateWatchlist}
+            >
+              <Text style={styles.createSmallButtonText}>Create</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {!showNewInput && (
+          <TouchableOpacity
+            style={[styles.createButton, { backgroundColor: COLORS.primary }]}
+            onPress={() => setShowNewInput(true)}
+          >
+            <Text style={styles.createButtonText}>+ Create Watchlist</Text>
+          </TouchableOpacity>
+        )}
+      </KeyboardAvoidingView>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}
+    >
       <View style={styles.header}>
         <Text style={[styles.title, { color: textColor }]}>My Portfolio</Text>
         <TouchableOpacity
@@ -143,7 +176,7 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
