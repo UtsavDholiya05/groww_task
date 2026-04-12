@@ -51,11 +51,18 @@ export const AddToWatchlistBottomSheet = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal 
+      visible={visible} 
+      transparent 
+      animationType="slide" 
+      onRequestClose={onClose}
+      presentationStyle="overFullScreen"
+    >
       <View style={styles.overlay}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1, justifyContent: 'flex-end' }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 100}
         >
           <View style={[styles.bottomSheet, { backgroundColor: colors }]}>
           <View style={[styles.header, { backgroundColor: bg }]}>

@@ -6,8 +6,8 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants';
 import { fundAPI } from '../services/api';
 import { FundCard } from '../components/FundCard';

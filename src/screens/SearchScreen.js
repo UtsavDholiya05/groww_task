@@ -6,8 +6,8 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppStore } from '../store/appStore';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS, DEBOUNCE_DELAY } from '../constants';
 import { LoadingState } from '../components/LoadingState';

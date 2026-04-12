@@ -9,8 +9,8 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore } from '../store/appStore';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants';
@@ -89,53 +89,62 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
 
   if (watchlists.length === 0) {
     return (
-      <SafeAreaView
-        style={[styles.container, { backgroundColor: colors }]}
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
       >
-        <EmptyState
-          title="My Portfolio"
-          description="No watchlists yet. Start by creating one!"
-          isDark={isDark}
-        />
-        
-        {showNewInput && (
-          <View style={[styles.inputContainer, { backgroundColor: surface }]}>
-            <TextInput
-              style={[
-                styles.newWatchlistInput,
-                { color: textColor, borderColor: isDark ? COLORS.darkBg : COLORS.border },
-              ]}
-              placeholder="Enter watchlist name"
-              placeholderTextColor={textSecondary}
-              value={newWatchlistName}
-              onChangeText={setNewWatchlistName}
-              autoFocus
-            />
-            <TouchableOpacity
-              style={[styles.createSmallButton, { backgroundColor: COLORS.primary }]}
-              onPress={handleCreateWatchlist}
-            >
-              <Text style={styles.createSmallButtonText}>Create</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        <SafeAreaView
+          style={[styles.container, { backgroundColor: colors }]}
+        >
+          <EmptyState
+            title="My Portfolio"
+            description="No watchlists yet. Start by creating one!"
+            isDark={isDark}
+          />
+          
+          {showNewInput && (
+            <View style={[styles.inputContainer, { backgroundColor: surface }]}>
+              <TextInput
+                style={[
+                  styles.newWatchlistInput,
+                  { color: textColor, borderColor: isDark ? COLORS.darkBg : COLORS.border },
+                ]}
+                placeholder="Enter watchlist name"
+                placeholderTextColor={textSecondary}
+                value={newWatchlistName}
+                onChangeText={setNewWatchlistName}
+                autoFocus
+              />
+              <TouchableOpacity
+                style={[styles.createSmallButton, { backgroundColor: COLORS.primary }]}
+                onPress={handleCreateWatchlist}
+              >
+                <Text style={styles.createSmallButtonText}>Create</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
-        {!showNewInput && (
-          <TouchableOpacity
-            style={[styles.createButton, { backgroundColor: COLORS.primary }]}
-            onPress={() => setShowNewInput(true)}
-          >
-            <Text style={styles.createButtonText}>+ Create Watchlist</Text>
-          </TouchableOpacity>
-        )}
-      </SafeAreaView>
+          {!showNewInput && (
+            <TouchableOpacity
+              style={[styles.createButton, { backgroundColor: COLORS.primary }]}
+              onPress={() => setShowNewInput(true)}
+            >
+              <Text style={styles.createButtonText}>+ Create Watchlist</Text>
+            </TouchableOpacity>
+          )}
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     );
   }
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors }]}
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
     >
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors }]}
+      >
       <View style={styles.header}>
         <Text style={[styles.title, { color: textColor }]}>My Portfolio</Text>
         <TouchableOpacity
@@ -175,7 +184,8 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
