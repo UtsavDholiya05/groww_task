@@ -161,7 +161,7 @@ export const WatchlistDetailScreen = ({ route, navigation, isDark = false }) => 
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => handleRemoveFund(item.schemeCode)} style={styles.removeButton}>
-          <Text style={{ color: COLORS.error }}>✕</Text>
+          <Text style={{ color: COLORS.error }}>🗑</Text>
         </TouchableOpacity>
       </View>
     );
@@ -181,7 +181,7 @@ export const WatchlistDetailScreen = ({ route, navigation, isDark = false }) => 
             isDark={isDark}
           />
           <TouchableOpacity
-            onPress={() => navigation.navigate('Explore')}
+            onPress={() => navigation.navigate('ExploreTab')}
             style={[styles.exploreFundsButton, { backgroundColor: COLORS.primary }]}
           >
             <Text style={styles.exploreFundsButtonText}>Explore Funds</Text>

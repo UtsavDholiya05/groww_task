@@ -85,6 +85,7 @@ const WatchlistStackNavigator = ({ isDark = false }) => {
 
   return (
     <Stack.Navigator
+      initialRouteName="WatchlistMain"
       screenOptions={{
         headerStyle: {
           backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface,

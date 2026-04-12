@@ -2,13 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../constants';
 
-export const EmptyState = ({ title, description, isDark = false }) => {
+export const EmptyState = ({ title, description, isDark = false, containerStyle }) => {
   const colors = isDark ? COLORS.darkBg : COLORS.background;
   const textColor = isDark ? COLORS.darkText : COLORS.text;
   const textSecondary = isDark ? COLORS.darkTextSecondary : COLORS.textSecondary;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors }]}>
+    <View style={[styles.container, { backgroundColor: colors }, containerStyle]}>
       <View style={[styles.iconContainer, { backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface }]}>
         <Text style={styles.icon}>📋</Text>
       </View>
@@ -20,7 +20,6 @@ export const EmptyState = ({ title, description, isDark = false }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 30,

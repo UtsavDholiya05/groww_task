@@ -9,6 +9,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -25,6 +26,15 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
   const { watchlists, loadWatchlists, createWatchlist, deleteWatchlist } = useAppStore();
   const [showNewInput, setShowNewInput] = useState(false);
   const [newWatchlistName, setNewWatchlistName] = useState('');
+
+  const handleBackPress = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+
+    navigation.navigate('ExploreTab');
+  };
 
   useEffect(() => {
     loadWatchlists();
@@ -89,51 +99,31 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
 
   if (watchlists.length === 0) {
     return (
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors }]}
       >
-        <SafeAreaView
-          style={[styles.container, { backgroundColor: colors }]}
-        >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+            <Text style={[styles.backIcon, { color: textColor }]}>←</Text>
+          </TouchableOpacity>
+          <Text style={[styles.title, { color: textColor }]}>Watchlist</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: SPACING.lg }}>
           <EmptyState
-            title="My Portfolio"
-            description="No watchlists yet. Start by creating one!"
+            title="No Funds in This Watchlist"
+            description="Add funds from the Explore screen"
             isDark={isDark}
+            containerStyle={{ flex: 0 }}
           />
           
-          {showNewInput && (
-            <View style={[styles.inputContainer, { backgroundColor: surface }]}>
-              <TextInput
-                style={[
-                  styles.newWatchlistInput,
-                  { color: textColor, borderColor: isDark ? COLORS.darkBg : COLORS.border },
-                ]}
-                placeholder="Enter watchlist name"
-                placeholderTextColor={textSecondary}
-                value={newWatchlistName}
-                onChangeText={setNewWatchlistName}
-                autoFocus
-              />
-              <TouchableOpacity
-                style={[styles.createSmallButton, { backgroundColor: COLORS.primary }]}
-                onPress={handleCreateWatchlist}
-              >
-                <Text style={styles.createSmallButtonText}>Create</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {!showNewInput && (
-            <TouchableOpacity
-              style={[styles.createButton, { backgroundColor: COLORS.primary }]}
-              onPress={() => setShowNewInput(true)}
-            >
-              <Text style={styles.createButtonText}>+ Create Watchlist</Text>
-            </TouchableOpacity>
-          )}
-        </SafeAreaView>
-      </KeyboardAvoidingView>
+          <TouchableOpacity
+            style={[styles.createButton, { backgroundColor: COLORS.primary, width: '80%', marginTop: SPACING.lg }]}
+            onPress={() => navigation.navigate('ExploreTab')}
+          >
+            <Text style={styles.createButtonText}>Explore Funds</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -146,7 +136,10 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
         style={[styles.container, { backgroundColor: colors }]}
       >
       <View style={styles.header}>
-        <Text style={[styles.title, { color: textColor }]}>My Portfolio</Text>
+        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+          <Text style={[styles.backIcon, { color: textColor }]}>←</Text>
+        </TouchableOpacity>
+        <Text style={[styles.title, { color: textColor }]}>Watchlist</Text>
         <TouchableOpacity
           style={[styles.addButton, { backgroundColor: COLORS.primary }]}
           onPress={() => setShowNewInput(true)}
@@ -195,18 +188,30 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: 60,
-    paddingBottom: SPACING.lg,
+    paddingTop: SPACING.md,
+    paddingBottom: SPACING.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
+  backButton: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SPACING.xs,
+  },
+  backIcon: {
+    fontSize: 18,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+  },
   title: {
-    fontSize: TYPOGRAPHY.sizes['3xl'],
+    flex: 1,
+    fontSize: TYPOGRAPHY.sizes.xl,
     fontWeight: TYPOGRAPHY.weights.bold,
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
   },
   addButton: {
     width: 44,
@@ -252,11 +257,13 @@ const styles = StyleSheet.create({
     padding: SPACING.sm,
   },
   createButton: {
-    marginHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.md,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: BORDER_RADIUS.lg,
     alignItems: 'center',
-    marginBottom: SPACING.xl,
+    justifyContent: 'center',
+    marginTop: SPACING.lg,
+    marginBottom: 0,
     ...SHADOWS.md,
   },
   createButtonText: {
