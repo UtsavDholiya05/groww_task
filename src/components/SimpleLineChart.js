@@ -20,9 +20,9 @@ export const SimpleLineChart = ({ data, isDark = false }) => {
     return null;
   }
 
-  const chartWidth = width - 40;
+  const chartWidth = width - 64;
   const chartHeight = 220;
-  const padding = 20;
+  const padding = 16;
   const innerWidth = chartWidth - padding * 2;
   const innerHeight = chartHeight - padding * 2;
 
@@ -58,9 +58,9 @@ export const SimpleLineChart = ({ data, isDark = false }) => {
     });
 
     return (
-      <View style={{ width: chartWidth, height: chartHeight, position: 'relative' }}>
+      <View style={{ width: chartWidth, height: chartHeight, position: 'relative', overflow: 'hidden' }}>
         {/* Grid background */}
-        <View style={{ position: 'absolute', width: '100%', height: '100%' }}>
+        <View style={{ position: 'absolute', left: padding, top: padding, width: innerWidth, height: innerHeight }}>
           {Array.from({ length: 4 }).map((_, i) => (
             <View
               key={`grid-${i}`}
