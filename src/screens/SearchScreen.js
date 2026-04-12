@@ -60,24 +60,22 @@ export const SearchScreen = ({ navigation, isDark = false }) => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
-      {/* Header with Search Input */}
-      <View style={[styles.header, { backgroundColor: colors }]}>
-        <View style={[styles.searchInputContainer, { backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface, borderColor: isDark ? COLORS.darkBg : COLORS.border }]}>
-          <Text style={{ fontSize: 16, marginRight: 8, color: textSecondary }}>🔍</Text>
-          <TextInput
-            style={[styles.searchInput, { color: textColor }]}
-            placeholder="Search funds..."
-            placeholderTextColor={textSecondary}
-            value={query}
-            onChangeText={handleSearch}
-            autoFocus
-          />
-          {query ? (
-            <TouchableOpacity onPress={handleClear} style={styles.clearButtonContainer}>
-              <Text style={[styles.clearButton, { color: textSecondary }]}>✕</Text>
-            </TouchableOpacity>
-          ) : null}
-        </View>
+      {/* Search Input */}
+      <View style={[styles.searchInputContainer, { backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface, borderColor: isDark ? COLORS.darkBg : COLORS.border, marginHorizontal: SPACING.lg }]}>
+        <Text style={{ fontSize: 16, marginRight: 8, color: textSecondary }}>🔍</Text>
+        <TextInput
+          style={[styles.searchInput, { color: textColor }]}
+          placeholder="Search funds..."
+          placeholderTextColor={textSecondary}
+          value={query}
+          onChangeText={handleSearch}
+          autoFocus
+        />
+        {query ? (
+          <TouchableOpacity onPress={handleClear} style={styles.clearButtonContainer}>
+            <Text style={[styles.clearButton, { color: textSecondary }]}>✕</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {searchLoading ? (
@@ -110,17 +108,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.sm,
-    paddingBottom: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SPACING.md,
+    marginHorizontal: SPACING.lg,
+    marginVertical: 0,
+    marginTop: -20,
+    marginBottom: SPACING.md,
     borderWidth: 1.5,
     borderRadius: BORDER_RADIUS.lg,
     height: 48,

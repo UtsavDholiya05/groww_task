@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   // Header Styling
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: 60,
+    paddingTop: SPACING.md,
     paddingBottom: SPACING.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   // Search Bar Styling
   searchBarContainer: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.sm,
+    paddingTop: 0,
     paddingBottom: SPACING.md,
   },
   searchBar: {
