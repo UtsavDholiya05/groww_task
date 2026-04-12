@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants';
 import { fundAPI } from '../services/api';
@@ -112,22 +113,22 @@ export const ViewAllScreen = ({ route, navigation, isDark = false }) => {
 
   if (error) {
     return (
-      <View style={[styles.container, { backgroundColor: colors }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
         <EmptyState title="Error Loading Funds" description={error} isDark={isDark} />
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (funds.length === 0) {
     return (
-      <View style={[styles.container, { backgroundColor: colors }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
         <EmptyState title="No Funds Found" description="No funds available in this category" isDark={isDark} />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
       <FlatList
         data={funds}
         renderItem={renderFundCard}
@@ -138,7 +139,7 @@ export const ViewAllScreen = ({ route, navigation, isDark = false }) => {
         ListFooterComponent={renderFooter}
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.md,
+    paddingTop: 50,
     paddingBottom: SPACING.lg,
   },
   listItem: {

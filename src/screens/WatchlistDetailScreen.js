@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  SafeAreaView,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore } from '../store/appStore';
@@ -113,9 +114,9 @@ export const WatchlistDetailScreen = ({ route, navigation, isDark = false }) => 
 
   if (!watchlist) {
     return (
-      <View style={[styles.container, { backgroundColor: colors }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
         <EmptyState title="Watchlist Not Found" description="This watchlist no longer exists" isDark={isDark} />
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -167,7 +168,7 @@ export const WatchlistDetailScreen = ({ route, navigation, isDark = false }) => 
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
       {loading ? (
         <View style={styles.loadingContainer}>
           <Text style={{ color: textSecondary }}>Loading...</Text>
@@ -195,7 +196,7 @@ export const WatchlistDetailScreen = ({ route, navigation, isDark = false }) => 
           showsVerticalScrollIndicator={false}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    paddingTop: SPACING.lg,
+    paddingTop: 50,
   },
   fundItem: {
     flexDirection: 'row',

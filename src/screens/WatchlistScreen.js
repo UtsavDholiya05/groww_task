@@ -9,6 +9,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAppStore } from '../store/appStore';
@@ -88,9 +89,8 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
 
   if (watchlists.length === 0) {
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors }]}
       >
         <EmptyState
           title="My Portfolio"
@@ -128,14 +128,13 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
             <Text style={styles.createButtonText}>+ Create Watchlist</Text>
           </TouchableOpacity>
         )}
-      </KeyboardAvoidingView>
+      </SafeAreaView>
     );
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[styles.container, { backgroundColor: colors, paddingTop: 16 }]}
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors }]}
     >
       <View style={styles.header}>
         <Text style={[styles.title, { color: textColor }]}>My Portfolio</Text>
@@ -176,7 +175,7 @@ export const WatchlistScreen = ({ navigation, isDark = false }) => {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -186,7 +185,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
+    paddingTop: 50,
+    paddingBottom: SPACING.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

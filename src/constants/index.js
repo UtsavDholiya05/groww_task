@@ -1,41 +1,69 @@
 export const COLORS = {
-  // Primary - Modern Groww Green
-  primary: '#00D09C',
-  primaryDark: '#00A67E',
-  primaryLight: '#E8F8F4',
+  // Primary - Modern Vibrant Teal (Tech-forward & Fresh)
+  primary: '#06B6D4',
+  primaryDark: '#0891B2',
+  primaryLight: '#CFFAFE',
+  primaryVeryLight: '#ECFDF5',
   
-  // Secondary colors
-  secondary: '#6C63FF',
-  secondaryLight: '#F0EBFF',
+  // Secondary - Deep Navy (Trustworthy & Professional)
+  secondary: '#1F2937',
+  secondaryLight: '#E5E7EB',
+  secondaryVeryLight: '#F3F4F6',
   
-  // Semantic colors
-  success: '#00D09C',
-  error: '#FF4757',
-  warning: '#FFA502',
-  info: '#2E86DE',
+  // Accent - Vibrant Rose/Pink (Modern Appeal)
+  accent: '#EC4899',
+  accentLight: '#FBF4FA',
+  accentVeryLight: '#FDF2F8',
   
-  // Backgrounds
+  // Tertiary - Warm Sunset Orange (Engagement)
+  tertiary: '#F97316',
+  tertiaryLight: '#FEF3C7',
+  tertiaryVeryLight: '#FFFBEB',
+  
+  // Semantic colors - Vibrant & Clear
+  success: '#06B6D4',
+  successLight: '#CFFAFE',
+  error: '#EF4444',
+  errorLight: '#FEE2E2',
+  warning: '#F97316',
+  warningLight: '#FFEDD5',
+  info: '#3B82F6',
+  infoLight: '#DBEAFE',
+  
+  // Backgrounds - Clean & Modern
   background: '#FFFFFF',
-  surface: '#F8F9FA',
+  surface: '#F9FAFB',
+  surfaceLight: '#F3F4F6',
   overlay: 'rgba(0, 0, 0, 0.5)',
-  overlayLight: 'rgba(0, 208, 156, 0.1)',
+  overlayLight: 'rgba(6, 182, 212, 0.1)',
   
-  // Text colors
-  text: '#1A1A1A',
-  textSecondary: '#666666',
-  textTertiary: '#999999',
-  border: '#E0E0E0',
+  // Text colors - Clear Hierarchy
+  text: '#111827',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
+  placeholder: '#D1D5DB',
+  border: '#E5E7EB',
+  divider: '#F3F4F6',
   
-  // Dark mode
-  darkBg: '#0F1419',
-  darkSurface: '#1A1F2E',
-  darkText: '#FFFFFF',
-  darkTextSecondary: '#B0B0B0',
-  darkBorder: '#2A2F3E',
+  // Dark mode - Modern Dark Theme
+  darkBg: '#111827',
+  darkSurface: '#1F2937',
+  darkSurfaceLight: '#374151',
+  darkText: '#F9FAFB',
+  darkTextSecondary: '#D1D5DB',
+  darkBorder: '#4B5563',
+  darkDivider: '#374151',
+  
+  // Gradient accents
+  gradientStart: '#06B6D4',
+  gradientEnd: '#1F2937',
   
   // Legacy support
-  green: '#00D09C',
-  red: '#FF4757',
+  green: '#06B6D4',
+  red: '#EF4444',
+  blue: '#3B82F6',
+  orange: '#F97316',
+  pink: '#EC4899',
 };
 
 export const TYPOGRAPHY = {

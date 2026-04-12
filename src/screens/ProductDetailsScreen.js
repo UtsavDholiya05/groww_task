@@ -8,6 +8,7 @@ import {
   Modal,
   TextInput,
   Alert,
+  SafeAreaView,
 } from 'react-native';
 import { useAppStore } from '../store/appStore';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants';
@@ -187,7 +188,7 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
   const fundCategory = selectedFund.schemeType || 'Equity';
 
   return (
-    <View style={[styles.container, { backgroundColor: colors }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Fund Title and Category */}
         <View style={styles.titleSection}>
@@ -384,7 +385,7 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -394,7 +395,7 @@ const styles = StyleSheet.create({
   },
   titleSection: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.xl,
+    paddingTop: 50,
     paddingBottom: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,

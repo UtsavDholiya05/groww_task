@@ -38,6 +38,7 @@ export default function App() {
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         backgroundColor={isDark ? COLORS.darkBg : COLORS.background}
+        translucent={false}
       />
       <NavigationContainer>
         <RootNavigator isDark={isDark} />

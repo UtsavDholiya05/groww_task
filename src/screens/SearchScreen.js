@@ -6,6 +6,7 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import { useAppStore } from '../store/appStore';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS, DEBOUNCE_DELAY } from '../constants';
@@ -58,9 +59,9 @@ export const SearchScreen = ({ navigation, isDark = false }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
       {/* Header with Search Input */}
-      <View style={[styles.header, { backgroundColor: colors, paddingTop: 16 }]}>
+      <View style={[styles.header, { backgroundColor: colors }]}>
         <View style={[styles.searchInputContainer, { backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface, borderColor: isDark ? COLORS.darkBg : COLORS.border }]}>
           <Text style={{ fontSize: 16, marginRight: 8, color: textSecondary }}>🔍</Text>
           <TextInput
@@ -101,7 +102,7 @@ export const SearchScreen = ({ navigation, isDark = false }) => {
           />
         </>
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.lg,
-    paddingTop: SPACING.md,
+    paddingTop: 50,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },

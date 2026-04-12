@@ -7,6 +7,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   TextInput,
+  SafeAreaView,
 } from 'react-native';
 import { useAppStore } from '../store/appStore';
 import { COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../constants';
@@ -15,10 +16,12 @@ import { SkeletonLoader } from '../components/LoadingState';
 import { EmptyState } from '../components/EmptyState';
 
 export const ExploreScreen = ({ navigation, isDark = false }) => {
-  const colors = isDark ? COLORS.darkBg : COLORS.background;
-  const surface = isDark ? COLORS.darkSurface : COLORS.surface;
+  const bgColor = isDark ? COLORS.darkBg : COLORS.surfaceLight;
+  const colors = isDark ? COLORS.darkBg : COLORS.surfaceLight;
+  const surface = isDark ? COLORS.darkSurface : COLORS.background;
   const textColor = isDark ? COLORS.darkText : COLORS.text;
   const textSecondary = isDark ? COLORS.darkTextSecondary : COLORS.textSecondary;
+  const borderColor = isDark ? COLORS.darkBorder : COLORS.border;
 
   const { exploreCategories, loadExploreCategories } = useAppStore();
   const [refreshing, setRefreshing] = useState(false);
@@ -38,48 +41,65 @@ export const ExploreScreen = ({ navigation, isDark = false }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors }]}>
+      {/* Header - Outside ScrollView */}
+      <View style={styles.header}>
+        <View>
+          <Text style={[styles.title, { color: textColor }]}>MF Explorer</Text>
+          <Text style={[styles.subtitle, { color: textSecondary }]}>Discover funds that fit your goals</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Search')}
+          style={[styles.searchIconButton, { backgroundColor: COLORS.primary }]}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.searchIcon}>🔍</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Search Bar - Outside ScrollView */}
+      <View style={styles.searchBarContainer}>
+        <TextInput
+          style={[styles.searchBar, { backgroundColor: surface, color: textColor, borderColor }]}
+          placeholder="Search funds..."
+          placeholderTextColor={textSecondary}
+          onFocus={() => navigation.navigate('Search')}
+        />
+      </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
+            tintColor={COLORS.primary}
             colors={[COLORS.primary]}
           />
         }
       >
-        <View style={[styles.header, { backgroundColor: surface }]}>
-          <Text style={[styles.title, { color: textColor }]}>MF Explorer</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Search')}
-            style={[styles.searchButton, { backgroundColor: isDark ? COLORS.darkBg : COLORS.primaryLight }]}
-          >
-            <Text style={{ fontSize: 18 }}>🔍</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.searchBarContainer}>
-          <TextInput
-            style={[styles.searchBar, { backgroundColor: surface, color: textColor }]}
-            placeholder="Search funds..."
-            placeholderTextColor={textSecondary}
-            onFocus={() => navigation.navigate('Search')}
-          />
-        </View>
-
+        {/* Categories */}
         <View style={styles.categoriesContainer}>
           {exploreCategories.map((category) => (
             <View key={category.id} style={styles.categorySection}>
+              {/* Category Header */}
               <View style={styles.categoryHeader}>
-                <Text style={[styles.categoryTitle, { color: textColor }]}>{category.name}</Text>
+                <View>
+                  <Text style={[styles.categoryTitle, { color: textColor }]}>{category.name}</Text>
+                  <View style={[styles.categoryUnderline, { backgroundColor: COLORS.primary }]} />
+                </View>
                 {category.funds.length > 0 && (
-                  <TouchableOpacity onPress={() => handleViewAll(category.id, category.name, category.query)}>
+                  <TouchableOpacity
+                    onPress={() => handleViewAll(category.id, category.name, category.query)}
+                    style={styles.viewAllButton}
+                    activeOpacity={0.7}
+                  >
                     <Text style={[styles.viewAllCTA, { color: COLORS.primary }]}>View All →</Text>
                   </TouchableOpacity>
                 )}
               </View>
 
+              {/* Grid Content */}
               {category.loading ? (
                 <View style={styles.gridContainer}>
                   <SkeletonLoader isDark={isDark} />
@@ -115,7 +135,7 @@ export const ExploreScreen = ({ navigation, isDark = false }) => {
           ))}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -123,76 +143,103 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  // Header Styling
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingTop: 50,
+    paddingBottom: SPACING.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    alignItems: 'flex-start',
   },
   title: {
     fontSize: TYPOGRAPHY.sizes['3xl'],
     fontWeight: TYPOGRAPHY.weights.bold,
     letterSpacing: -0.5,
+    marginBottom: SPACING.xs,
   },
-  searchButton: {
-    width: 44,
-    height: 44,
-    borderRadius: BORDER_RADIUS.md,
+  subtitle: {
+    fontSize: TYPOGRAPHY.sizes.base,
+    fontWeight: TYPOGRAPHY.weights.normal,
+    marginTop: SPACING.xs,
+  },
+  searchIconButton: {
+    width: 48,
+    height: 48,
+    borderRadius: BORDER_RADIUS.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    ...SHADOWS.md,
+    ...SHADOWS.lg,
   },
+  searchIcon: {
+    fontSize: TYPOGRAPHY.sizes.xl,
+  },
+  // Search Bar Styling
   searchBarContainer: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
+    paddingBottom: SPACING.lg,
   },
   searchBar: {
-    borderRadius: BORDER_RADIUS.md,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.lg,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
     fontSize: TYPOGRAPHY.sizes.base,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    ...SHADOWS.sm,
+    fontWeight: TYPOGRAPHY.weights.normal,
+    ...SHADOWS.md,
   },
+  // Categories Container
   categoriesContainer: {
-    paddingVertical: SPACING.sm,
+    paddingVertical: SPACING.md,
   },
   categorySection: {
-    marginBottom: SPACING['2xl'],
+    marginBottom: SPACING['3xl'],
   },
+  // Category Header Styling
   categoryHeader: {
     paddingHorizontal: SPACING.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.md,
+    alignItems: 'flex-start',
+    marginBottom: SPACING.xl,
   },
   categoryTitle: {
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: TYPOGRAPHY.weights.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    marginBottom: SPACING.xs,
+  },
+  categoryUnderline: {
+    height: 3,
+    width: 24,
+    borderRadius: BORDER_RADIUS.sm,
+  },
+  viewAllButton: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
   },
   viewAllCTA: {
     fontSize: TYPOGRAPHY.sizes.base,
-    fontWeight: TYPOGRAPHY.weights.bold,
+    fontWeight: TYPOGRAPHY.weights.semibold,
   },
+  // Grid and Card Styling
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: SPACING.sm,
+    paddingHorizontal: SPACING.lg,
     justifyContent: 'space-between',
+    gap: SPACING.md,
   },
+  // Error Styling
   errorContainer: {
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.xl,
   },
   errorText: {
     fontSize: TYPOGRAPHY.sizes.base,
     fontWeight: TYPOGRAPHY.weights.medium,
+    textAlign: 'center',
   },
 });

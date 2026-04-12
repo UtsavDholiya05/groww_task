@@ -1,15 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS } from '../constants';
+import { COLORS, TYPOGRAPHY, BORDER_RADIUS, SPACING, SHADOWS } from '../constants';
 
 export const FundCard = ({ fund, onPress, isDark = false }) => {
   const textColor = isDark ? COLORS.darkText : COLORS.text;
   const textSecondary = isDark ? COLORS.darkTextSecondary : COLORS.textSecondary;
-  const surfaceColor = isDark ? COLORS.darkSurface : COLORS.surface;
+  const surfaceColor = isDark ? COLORS.darkSurface : COLORS.background;
+  const borderColor = isDark ? COLORS.darkBorder : COLORS.border;
 
   // Extract fund type from scheme name (first word or abbreviation)
   const fundType = fund.schemeName?.split(' ')[0]?.substring(0, 3) || 'MF';
-  const fundName = fund.schemeName?.substring(0, 20) || 'Fund';
+  const fundName = fund.schemeName?.substring(0, 25) || 'Fund';
   
   // Improved NAV display with better handling
   let navDisplay = 'N/A';
@@ -21,25 +22,18 @@ export const FundCard = ({ fund, onPress, isDark = false }) => {
       navDisplay = fund.nav.toFixed(2);
     }
   }
-  
-  // Debug log
-  console.log(`📊 FundCard rendering: ${fundName}`, {
-    navValue: fund.nav,
-    navType: typeof fund.nav,
-    navDisplay: navDisplay,
-  });
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: surfaceColor }]}
+      style={[styles.card, { backgroundColor: surfaceColor, borderColor }]}
       onPress={onPress}
-      activeOpacity={0.7}
+      activeOpacity={0.75}
     >
       <View style={[styles.iconCircle, { backgroundColor: COLORS.primaryLight }]}>
         <Text style={styles.iconText}>{fundType}</Text>
       </View>
 
-      <Text style={[styles.fundName, { color: textColor }]} numberOfLines={2}>
+      <Text style={[styles.fundName, { color: textColor }]} numberOfLines={3}>
         {fundName}
       </Text>
 
@@ -54,36 +48,39 @@ const styles = StyleSheet.create({
   card: {
     width: '48%',
     alignItems: 'center',
-    padding: 14,
-    marginBottom: 12,
-    borderRadius: 12,
-    minHeight: 160,
-    justifyContent: 'center',
+    paddingVertical: SPACING.xl,
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.lg,
+    borderRadius: BORDER_RADIUS.lg,
+    minHeight: 170,
+    justifyContent: 'flex-start',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    ...SHADOWS.md,
   },
   iconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: SPACING.lg,
+    ...SHADOWS.sm,
   },
   iconText: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: TYPOGRAPHY.sizes.lg,
+    fontWeight: TYPOGRAPHY.weights.bold,
     color: COLORS.primary,
   },
   fundName: {
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 8,
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    marginBottom: SPACING.md,
     textAlign: 'center',
+    lineHeight: TYPOGRAPHY.lineHeights.tight * TYPOGRAPHY.sizes.sm,
   },
   navValue: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: TYPOGRAPHY.sizes.xl,
+    fontWeight: TYPOGRAPHY.weights.bold,
     textAlign: 'center',
   },
 });

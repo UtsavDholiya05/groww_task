@@ -1,8 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { COLORS } from '../constants';
+import { COLORS, SPACING, SHADOWS } from '../constants';
 import { ExploreScreen } from '../screens/ExploreScreen';
 import { WatchlistScreen } from '../screens/WatchlistScreen';
 import { ProductDetailsScreen } from '../screens/ProductDetailsScreen';
@@ -119,8 +119,8 @@ const WatchlistStackNavigator = ({ isDark = false }) => {
 };
 
 export const RootNavigator = ({ isDark = false }) => {
-  const colors = isDark ? COLORS.darkBg : COLORS.background;
-  const surfaceColor = isDark ? COLORS.darkSurface : COLORS.surface;
+  const colors = isDark ? COLORS.darkBg : COLORS.surfaceLight;
+  const surfaceColor = isDark ? COLORS.darkSurface : COLORS.background;
   const inactiveColor = isDark ? COLORS.darkTextSecondary : COLORS.textSecondary;
 
   return (
@@ -129,18 +129,20 @@ export const RootNavigator = ({ isDark = false }) => {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: surfaceColor,
-          borderTopColor: isDark ? COLORS.darkBg : COLORS.border,
+          borderTopColor: isDark ? COLORS.darkBorder : COLORS.border,
           borderTopWidth: 1,
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 60,
+          paddingBottom: SPACING.sm,
+          paddingTop: SPACING.sm,
+          height: 68,
+          ...SHADOWS.lg,
         },
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: inactiveColor,
         tabBarLabelStyle: {
-          fontSize: 11,
-          marginTop: 4,
+          fontSize: 12,
+          marginTop: SPACING.xs,
           fontWeight: '500',
+          marginBottom: SPACING.xs,
         },
       }}
     >
@@ -148,7 +150,9 @@ export const RootNavigator = ({ isDark = false }) => {
         name="ExploreTab"
         options={{
           tabBarLabel: 'Explore',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🔍</Text>,
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 22, color }}>🔍</Text>
+          ),
         }}
       >
         {(props) => <ExploreStackNavigator {...props} isDark={isDark} />}
@@ -158,7 +162,9 @@ export const RootNavigator = ({ isDark = false }) => {
         name="WatchlistTab"
         options={{
           tabBarLabel: 'Watchlist',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>⭐</Text>,
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 22, color }}>⭐</Text>
+          ),
         }}
       >
         {(props) => <WatchlistStackNavigator {...props} isDark={isDark} />}
