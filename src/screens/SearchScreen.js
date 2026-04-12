@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
-    paddingTop: 50,
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
@@ -121,10 +121,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SPACING.md,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderRadius: BORDER_RADIUS.lg,
     height: 48,
-    ...SHADOWS.md,
+    ...SHADOWS.sm,
   },
   searchInput: {
     flex: 1,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
-    ...SHADOWS.sm,
+    ...SHADOWS.md,
   },
   badge: {
     width: 48,

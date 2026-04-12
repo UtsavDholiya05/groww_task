@@ -24,11 +24,21 @@ const ExploreStackNavigator = ({ isDark = false }) => {
           backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface,
           borderBottomColor: isDark ? COLORS.darkBg : COLORS.border,
           borderBottomWidth: 1,
+          height: 100,
         },
         headerTintColor: textColor,
         headerTitleStyle: {
           fontWeight: '600',
           color: textColor,
+        },
+        headerTitleContainerStyle: {
+          paddingTop: 30,
+        },
+        headerLeftContainerStyle: {
+          paddingTop: 30,
+        },
+        headerRightContainerStyle: {
+          paddingTop: 30,
         },
         headerBackTitleVisible: false,
         contentStyle: { backgroundColor: colors },
@@ -80,11 +90,21 @@ const WatchlistStackNavigator = ({ isDark = false }) => {
           backgroundColor: isDark ? COLORS.darkSurface : COLORS.surface,
           borderBottomColor: isDark ? COLORS.darkBg : COLORS.border,
           borderBottomWidth: 1,
+          height: 100,
         },
         headerTintColor: textColor,
         headerTitleStyle: {
           fontWeight: '600',
           color: textColor,
+        },
+        headerTitleContainerStyle: {
+          paddingTop: 30,
+        },
+        headerLeftContainerStyle: {
+          paddingTop: 30,
+        },
+        headerRightContainerStyle: {
+          paddingTop: 30,
         },
         headerBackTitleVisible: false,
         contentStyle: { backgroundColor: colors },
@@ -130,18 +150,18 @@ export const RootNavigator = ({ isDark = false }) => {
         tabBarStyle: {
           backgroundColor: surfaceColor,
           borderTopColor: isDark ? COLORS.darkBorder : COLORS.border,
-          borderTopWidth: 1,
-          paddingBottom: SPACING.sm,
-          paddingTop: SPACING.sm,
-          height: 68,
-          ...SHADOWS.lg,
+          borderTopWidth: 1.5,
+          paddingBottom: SPACING.md,
+          paddingTop: SPACING.md,
+          height: 72,
+          ...SHADOWS.xl,
         },
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: inactiveColor,
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           marginTop: SPACING.xs,
-          fontWeight: '500',
+          fontWeight: '600',
           marginBottom: SPACING.xs,
         },
       }}

@@ -87,9 +87,10 @@ export const fundAPI = {
       if (navHistory.length === 0 && nav > 0) {
         console.log(`⚠️  No nav history found, generating sample trending data`);
         const baseNav = nav;
-        navHistory = Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          nav: baseNav + (i * 2) + (Math.random() - 0.5) * 4, // Slight upward trend
+        // Generate 365 days of historical data for 6M, 1Y filtering
+        navHistory = Array.from({ length: 365 }, (_, i) => ({
+          date: new Date(Date.now() - (364 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          nav: baseNav + (i * 0.5) + (Math.random() - 0.5) * 2, // Slight upward trend with variation
         }));
       }
       }

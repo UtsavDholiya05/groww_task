@@ -66,6 +66,7 @@ export const Input = ({
               paddingLeft: icon ? 0 : SPACING.md,
               paddingRight: rightIcon ? 0 : SPACING.md,
               fontSize: TYPOGRAPHY.sizes.base,
+              fontWeight: TYPOGRAPHY.weights.medium,
             },
           ]}
           placeholder={placeholder}

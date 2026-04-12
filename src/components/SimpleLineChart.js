@@ -5,18 +5,16 @@ import { COLORS } from '../constants';
 const { width } = Dimensions.get('window');
 
 export const SimpleLineChart = ({ data, isDark = false }) => {
-  // Generate sample data if none provided or empty
   let chartData = data;
   if (!chartData || chartData.length < 2) {
     console.log('📊 No chart data provided, generating sample data');
-    // Generate sample upward trend for demo
-    chartData = Array.from({ length: 12 }, (_, i) => ({
-      date: new Date(Date.now() - (11 - i) * 30 * 24 * 60 * 60 * 1000).toISOString(),
-      nav: 100 + i * 5 + Math.random() * 10, // Upward trend with some variation
+    chartData = Array.from({ length: 30 }, (_, i) => ({
+      date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString(),
+      nav: 100 + i * 5 + Math.random() * 10,
     }));
   }
 
-  const validData = chartData.filter((d) => d && d.nav && !isNaN(d.nav));
+  const validData = chartData.filter((d) => d && d.nav && !isNaN(parseFloat(d.nav)));
   if (validData.length < 2) {
     console.log('📊 Not enough valid data points for chart');
     return null;
@@ -24,43 +22,45 @@ export const SimpleLineChart = ({ data, isDark = false }) => {
 
   const chartWidth = width - 40;
   const chartHeight = 220;
-  const padding = 16;
+  const padding = 20;
   const innerWidth = chartWidth - padding * 2;
   const innerHeight = chartHeight - padding * 2;
 
-  // Extract nav values
-  const values = validData.map((d) => parseFloat(d.nav) || 0).filter((v) => v > 0);
+  const values = validData.map((d) => parseFloat(d.nav)).filter((v) => !isNaN(v) && v > 0);
   const maxValue = Math.max(...values);
   const minValue = Math.min(...values);
   const range = maxValue - minValue || maxValue * 0.1;
 
-  // Determine trend
   const isPositive = values[values.length - 1] >= values[0];
   const lineColor = isPositive ? COLORS.success : COLORS.error;
-  const fillColor = isPositive ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)';
 
-  // Calculate point positions for line chart
-  const points = validData.map((d, index) => {
-    const navValue = parseFloat(d.nav);
-    const normalizedValue = (navValue - minValue) / range;
-    const x = (index / (validData.length - 1)) * innerWidth + padding;
-    const y = innerHeight - normalizedValue * innerHeight + padding;
-    return { x, y, nav: navValue, date: d.date };
-  });
+  // Calculate SVG path for smooth line
+  const generatePath = () => {
+    let path = '';
+    validData.forEach((d, index) => {
+      const navValue = parseFloat(d.nav);
+      const normalizedValue = (navValue - minValue) / range;
+      const x = (index / (validData.length - 1)) * innerWidth + padding;
+      const y = innerHeight - normalizedValue * innerHeight + padding;
+      path += `${index === 0 ? 'M' : 'L'} ${x} ${y} `;
+    });
+    return path;
+  };
 
-  // Create SVG-like line path using positioning
+  // Simpler render without transforms
   const renderLineChart = () => {
+    const points = validData.map((d, index) => {
+      const navValue = parseFloat(d.nav);
+      const normalizedValue = (navValue - minValue) / range;
+      const x = (index / (validData.length - 1)) * innerWidth + padding;
+      const y = innerHeight - normalizedValue * innerHeight + padding;
+      return { x, y };
+    });
+
     return (
-      <View style={{ position: 'relative', width: chartWidth, height: chartHeight }}>
-        {/* Background grid */}
-        <View
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            opacity: 0.3,
-          }}
-        >
+      <View style={{ width: chartWidth, height: chartHeight, position: 'relative' }}>
+        {/* Grid background */}
+        <View style={{ position: 'absolute', width: '100%', height: '100%' }}>
           {Array.from({ length: 4 }).map((_, i) => (
             <View
               key={`grid-${i}`}
@@ -68,19 +68,19 @@ export const SimpleLineChart = ({ data, isDark = false }) => {
                 position: 'absolute',
                 width: '100%',
                 height: 1,
-                backgroundColor: isDark ? '#444' : '#e0e0e0',
+                backgroundColor: isDark ? '#333' : '#e5e5e5',
                 top: `${(i + 1) * 25}%`,
               }}
             />
           ))}
         </View>
 
-        {/* Connecting lines between points */}
+        {/* Line segments */}
         {points.slice(0, -1).map((point, idx) => {
           const nextPoint = points[idx + 1];
           const dx = nextPoint.x - point.x;
           const dy = nextPoint.y - point.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          const length = Math.sqrt(dx * dx + dy * dy);
           const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
           return (
@@ -88,64 +88,68 @@ export const SimpleLineChart = ({ data, isDark = false }) => {
               key={`line-${idx}`}
               style={{
                 position: 'absolute',
-                width: distance,
-                height: 2,
+                height: 3,
                 backgroundColor: lineColor,
                 left: point.x,
-                top: point.y,
-                transformOrigin: '0 50%',
+                top: point.y - 1.5,
+                width: length,
+                shadowColor: lineColor,
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 2,
+                elevation: 2,
+                transformOrigin: 'left center',
                 transform: [{ rotate: `${angle}deg` }],
-                opacity: 0.8,
               }}
             />
           );
         })}
 
-        {/* Data points (circles) */}
+        {/* Data points */}
         {points.map((point, idx) => (
           <View
             key={`point-${idx}`}
             style={{
               position: 'absolute',
-              width: 6,
-              height: 6,
-              borderRadius: 3,
+              width: 8,
+              height: 8,
+              borderRadius: 4,
               backgroundColor: lineColor,
-              left: point.x - 3,
-              top: point.y - 3,
+              left: point.x - 4,
+              top: point.y - 4,
               shadowColor: lineColor,
               shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
+              shadowOpacity: 0.4,
               shadowRadius: 3,
               elevation: 3,
             }}
           />
         ))}
 
-        {/* Y-axis labels */}
+        {/* Y-axis values */}
         <Text
           style={{
             position: 'absolute',
-            fontSize: 9,
+            fontSize: 10,
             color: isDark ? COLORS.darkTextSecondary : COLORS.textSecondary,
-            fontWeight: '500',
+            fontWeight: '600',
             right: 8,
-            top: padding - 6,
+            top: 8,
           }}
         >
-          ₹{maxValue.toFixed(0)}
+          ₹{maxValue.toFixed(2)}
         </Text>
         <Text
           style={{
             position: 'absolute',
-            fontSize: 9,
+            fontSize: 10,
             color: isDark ? COLORS.darkTextSecondary : COLORS.textSecondary,
-            fontWeight: '500',
+            fontWeight: '600',
             right: 8,
-            bottom: padding - 6,
+            bottom: 32,
           }}
         >
-          ₹{minValue.toFixed(0)}
+          ₹{minValue.toFixed(2)}
         </Text>
       </View>
     );
@@ -156,46 +160,20 @@ export const SimpleLineChart = ({ data, isDark = false }) => {
       style={[
         styles.chartContainer,
         {
-          backgroundColor: isDark ? 'rgba(30, 30, 30, 0.5)' : 'rgba(250, 250, 250, 0.8)',
-          borderRadius: 12,
+          backgroundColor: isDark ? 'rgba(25, 25, 25, 0.8)' : 'rgba(248, 248, 248, 0.9)',
           borderColor: isDark ? COLORS.darkBg : '#e0e0e0',
-          borderWidth: 1,
         },
       ]}
     >
       {renderLineChart()}
-
-      {/* X-axis labels (time periods) */}
-      <View style={styles.xAxisLabels}>
-        {['6M', '1Y', 'ALL'].map((label, idx) => (
-          <Text
-            key={`xlabel-${idx}`}
-            style={{
-              fontSize: 10,
-              color: isDark ? COLORS.darkTextSecondary : COLORS.textSecondary,
-              fontWeight: '500',
-              marginHorizontal: 12,
-            }}
-          >
-            {label}
-          </Text>
-        ))}
-      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   chartContainer: {
-    marginVertical: 16,
-    marginHorizontal: 0,
-    paddingBottom: 24,
-    paddingTop: 8,
-  },
-  xAxisLabels: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingRight: 16,
-    paddingTop: 8,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderRadius: 10,
   },
 });

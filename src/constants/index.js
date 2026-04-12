@@ -21,8 +21,8 @@ export const COLORS = {
   tertiaryVeryLight: '#FFFBEB',
   
   // Semantic colors - Vibrant & Clear
-  success: '#06B6D4',
-  successLight: '#CFFAFE',
+  success: '#10B981',
+  successLight: '#D1FAE5',
   error: '#EF4444',
   errorLight: '#FEE2E2',
   warning: '#F97316',

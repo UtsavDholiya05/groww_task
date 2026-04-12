@@ -130,7 +130,17 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
   // Get filtered chart data based on selected time period
   const getFilteredChartData = () => {
     const navHistory = selectedFund.navHistory || [];
-    if (navHistory.length === 0) return [];
+    console.log(`📊 Filtering data for period: ${selectedTimePeriod}, Total items: ${navHistory.length}`);
+    
+    if (navHistory.length === 0) {
+      console.log('❌ No nav history available');
+      return [];
+    }
+
+    if (selectedTimePeriod === 'ALL') {
+      console.log(`✅ Returning all ${navHistory.length} items`);
+      return navHistory;
+    }
 
     const now = new Date();
     const cutoffDate = new Date();
@@ -141,11 +151,15 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
       cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
     }
 
-    return navHistory.filter((item) => {
-      if (selectedTimePeriod === 'ALL') return true;
-      const itemDate = new Date(item.date || 0);
-      return itemDate >= cutoffDate;
+    const filtered = navHistory.filter((item) => {
+      if (!item.date) return false;
+      // Parse date string properly (handle both ISO and YYYY-MM-DD formats)
+      const itemDate = new Date(item.date);
+      return !isNaN(itemDate.getTime()) && itemDate >= cutoffDate;
     });
+
+    console.log(`✅ Filtered ${selectedTimePeriod}: ${filtered.length} items (cutoff: ${cutoffDate.toDateString()})`);
+    return filtered;
   };
 
   // Calculate change percentage for selected period
@@ -201,7 +215,14 @@ export const ProductDetailsScreen = ({ route, navigation, isDark = false }) => {
         </View>
 
         {/* NAV and Change Percentage */}
-        <View style={styles.navSection}>
+        <View style={[
+          styles.navSection,
+          {
+            backgroundColor: changePercent >= 0 
+              ? isDark ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.06)'
+              : isDark ? 'rgba(239, 68, 68, 0.08)' : 'rgba(239, 68, 68, 0.06)',
+          }
+        ]}>
           <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
             <Text style={[styles.navLabel, { color: textColor, marginRight: 8 }]}>NAV</Text>
             <Text style={[styles.navAmount, { color: textColor, marginRight: 16 }]}>
@@ -395,19 +416,22 @@ const styles = StyleSheet.create({
   },
   titleSection: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: 50,
+    paddingTop: SPACING.sm,
     paddingBottom: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
   fundTitle: {
-    fontSize: TYPOGRAPHY.sizes.xl,
+    fontSize: TYPOGRAPHY.sizes['3xl'],
     fontWeight: TYPOGRAPHY.weights.bold,
     marginBottom: SPACING.sm,
+    letterSpacing: -0.5,
+    lineHeight: TYPOGRAPHY.lineHeights.tight * TYPOGRAPHY.sizes['3xl'],
   },
   categoryLabel: {
     fontSize: TYPOGRAPHY.sizes.sm,
-    fontWeight: TYPOGRAPHY.weights.normal,
+    fontWeight: TYPOGRAPHY.weights.medium,
+    letterSpacing: 0.3,
   },
   navSection: {
     flexDirection: 'row',
@@ -415,7 +439,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.lg,
-    backgroundColor: COLORS.primaryLight,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
@@ -430,8 +453,9 @@ const styles = StyleSheet.create({
     marginRight: SPACING.lg,
   },
   changePercent: {
-    fontSize: TYPOGRAPHY.sizes.base,
-    fontWeight: TYPOGRAPHY.weights.semibold,
+    fontSize: TYPOGRAPHY.sizes.lg,
+    fontWeight: TYPOGRAPHY.weights.bold,
+    letterSpacing: -0.2,
   },
   chartSection: {
     marginHorizontal: SPACING.lg,
@@ -439,9 +463,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.lg,
     borderRadius: BORDER_RADIUS.lg,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.border,
-    ...SHADOWS.sm,
+    ...SHADOWS.md,
   },
   timePeriodContainer: {
     flexDirection: 'row',
@@ -452,12 +476,13 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.sm,
   },
   timePeriodButton: {
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.lg,
   },
   timePeriodText: {
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.semibold,
+    letterSpacing: 0.3,
   },
   lineChartContainer: {
     height: 140,

@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: 50,
+    paddingTop: 60,
     paddingBottom: SPACING.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -194,8 +194,9 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.border,
   },
   title: {
-    fontSize: TYPOGRAPHY.sizes['2xl'],
+    fontSize: TYPOGRAPHY.sizes['3xl'],
     fontWeight: TYPOGRAPHY.weights.bold,
+    letterSpacing: -0.5,
   },
   addButton: {
     width: 44,
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...SHADOWS.sm,
+    ...SHADOWS.md,
   },
   watchlistContent: {
     flex: 1,
@@ -231,10 +232,11 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.base,
     fontWeight: TYPOGRAPHY.weights.semibold,
     marginBottom: SPACING.xs,
+    letterSpacing: -0.2,
   },
   fundCount: {
     fontSize: TYPOGRAPHY.sizes.sm,
-    fontWeight: TYPOGRAPHY.weights.normal,
+    fontWeight: TYPOGRAPHY.weights.medium,
   },
   deleteButton: {
     padding: SPACING.sm,

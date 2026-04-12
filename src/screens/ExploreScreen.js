@@ -146,16 +146,16 @@ const styles = StyleSheet.create({
   // Header Styling
   header: {
     paddingHorizontal: SPACING.lg,
-    paddingTop: 50,
+    paddingTop: 60,
     paddingBottom: SPACING.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
   title: {
-    fontSize: TYPOGRAPHY.sizes['3xl'],
+    fontSize: TYPOGRAPHY.sizes['4xl'],
     fontWeight: TYPOGRAPHY.weights.bold,
-    letterSpacing: -0.5,
+    letterSpacing: -0.8,
     marginBottom: SPACING.xs,
   },
   subtitle: {
@@ -205,16 +205,16 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   categoryTitle: {
-    fontSize: TYPOGRAPHY.sizes.lg,
+    fontSize: TYPOGRAPHY.sizes['2xl'],
     fontWeight: TYPOGRAPHY.weights.bold,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: SPACING.xs,
+    letterSpacing: 0.8,
+    marginBottom: SPACING.sm,
   },
   categoryUnderline: {
-    height: 3,
-    width: 24,
-    borderRadius: BORDER_RADIUS.sm,
+    height: 4,
+    width: 50,
+    borderRadius: BORDER_RADIUS.full,
   },
   viewAllButton: {
     paddingHorizontal: SPACING.md,

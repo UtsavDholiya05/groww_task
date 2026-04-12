@@ -207,17 +207,17 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    paddingTop: 50,
+    paddingTop: SPACING.sm,
   },
   fundItem: {
     flexDirection: 'row',
-    padding: SPACING.md,
+    padding: SPACING.lg,
     marginBottom: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...SHADOWS.sm,
+    ...SHADOWS.md,
   },
   fundContent: {
     flex: 1,
@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.base,
     fontWeight: TYPOGRAPHY.weights.semibold,
     marginBottom: SPACING.xs,
+    letterSpacing: -0.2,
   },
   navValue: {
     fontSize: TYPOGRAPHY.sizes.lg,
