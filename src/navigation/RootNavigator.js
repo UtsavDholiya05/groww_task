@@ -183,7 +183,7 @@ export const RootNavigator = ({ isDark = false }) => {
         options={{
           tabBarLabel: 'Watchlist',
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 22, color }}>⭐</Text>
+            <Text style={{ fontSize: 20, color }}>📑</Text>
           ),
         }}
       >

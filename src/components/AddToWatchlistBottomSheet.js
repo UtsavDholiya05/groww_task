@@ -9,6 +9,8 @@ import {
   TextInput,
   Dimensions,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { COLORS } from '../constants';
 
@@ -51,7 +53,11 @@ export const AddToWatchlistBottomSheet = ({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={[styles.bottomSheet, { backgroundColor: colors }]}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1, justifyContent: 'flex-end' }}
+        >
+          <View style={[styles.bottomSheet, { backgroundColor: colors }]}>
           <View style={[styles.header, { backgroundColor: bg }]}>
             <Text style={[styles.headerTitle, { color: textColor }]}>Add to Watchlist</Text>
             <TouchableOpacity onPress={onClose}>
@@ -59,7 +65,7 @@ export const AddToWatchlistBottomSheet = ({
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.content}>
+          <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
             {watchlists.length > 0 && (
               <View>
                 <Text style={[styles.sectionTitle, { color: textColor }]}>Add to Existing</Text>
@@ -146,7 +152,7 @@ export const AddToWatchlistBottomSheet = ({
               <Text style={styles.buttonTextWhite}>Add</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </View>
     </Modal>
   );
@@ -181,6 +187,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+    paddingBottom: 100,
   },
   sectionTitle: {
     fontSize: 14,
