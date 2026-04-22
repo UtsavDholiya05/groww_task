@@ -159,6 +159,7 @@ export const AddToWatchlistBottomSheet = ({
               <Text style={styles.buttonTextWhite}>Add</Text>
             </TouchableOpacity>
           </View>
+          </View>
         </KeyboardAvoidingView>
       </View>
     </Modal>
